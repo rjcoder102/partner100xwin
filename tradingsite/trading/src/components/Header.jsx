@@ -157,12 +157,12 @@ const Header = () => {
                 )}
 
                 {/* Mobile menu button */}
-                    <button
-                        className="md:hidden text-white mr-4"
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    >
-                        {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-                    </button>
+                <button
+                    className="md:hidden text-white mr-4"
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                    {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+                </button>
             </div>
         </header>
     );

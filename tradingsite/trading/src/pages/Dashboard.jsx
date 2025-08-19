@@ -8,6 +8,7 @@ import { MdWindow } from "react-icons/md";
 import LinksPage from "../components/LinksPage";
 import Deposit from "../components/Deposit";
 import Withdrawl from "./Withdrawl";
+import DownlineUser from "../components/DownlineUser";
 
 const Dashboard = () => {
     const [activePage, setActivePage] = useState("Dashboard");
@@ -18,7 +19,7 @@ const Dashboard = () => {
         { label: "Links", icon: <FaLink /> },
         { label: "Deposit", icon: <FaChartBar /> },
         { label: "Withdrawl", icon: <FaGift /> },
-        { label: "Promocodes", icon: <FaBook /> },
+        { label: "Downline User", icon: <FaBook /> },
         { label: "Postbook", icon: <FaBook /> },
         { label: "Contests", icon: <FaTrophy /> },
         { label: "TOP10 Partners", icon: <FaCrown /> },
@@ -45,12 +46,9 @@ const Dashboard = () => {
                 return (
                     <Withdrawl />
                 );
-            case "Support":
+            case "Downline User":
                 return (
-                    <div className="bg-white p-6 rounded-lg shadow">
-                        <h2 className="text-xl font-bold mb-4">📞 Support</h2>
-                        <p>Contact our support team for help.</p>
-                    </div>
+                   <DownlineUser/>
                 );
             default:
                 return (

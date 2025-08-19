@@ -118,7 +118,7 @@ export const loginUser = async (req, res) => {
 
 // ✅ Get User Profile
 export const getUserProfile = async (req, res) => {
-    const { id, email } = req.user; // user ID from auth middleware
+    const { id, email } = req.user; 
     try {
         // fetch user by ID from decoded token (middleware sets req.user.id)
         const [rows] = await pool1.query(
@@ -130,7 +130,7 @@ export const getUserProfile = async (req, res) => {
         //     [email]
         // );
 
-        // console.log("User profile fetched:", user[0]);
+        console.log("User profile fetched:");
 
 
         if (rows.length === 0) {

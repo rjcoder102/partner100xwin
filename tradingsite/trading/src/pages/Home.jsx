@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaChartPie, FaSyncAlt, FaGlobe } from "react-icons/fa";
 import Header from '../components/Header';
 import lefticon from "../assets/header-left.svg";
@@ -9,9 +9,11 @@ import statistics from "../assets/statistics.svg";
 import conversion from "../assets/conversion.svg";
 import geographical from "../assets/geographical.svg";
 import collaboration from '../assets/collaboration.svg';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../Redux/reducer/authSlice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const cards = [
     {
@@ -83,6 +85,7 @@ const Home = () => {
     });
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { loading, error, user } = useSelector((state) => state.auth);
 
     // Input handler
@@ -99,6 +102,32 @@ const Home = () => {
         e.preventDefault();
         dispatch(registerUser({ email: formData.email, password: formData.password }));
     };
+
+    // Show popup & navigate
+    useEffect(() => {
+        if (user) {
+            toast.success("🎉 Successfully registered!", {
+                position: "top-center",
+                autoClose: 2000,
+                theme: "colored",
+            });
+
+            setTimeout(() => {
+                navigate("/dashboard");
+            }, 2200);
+        }
+    }, [user, navigate]);
+
+    // Error toast
+    useEffect(() => {
+        if (error) {
+            toast.error(error, {
+                position: "top-center",
+                autoClose: 2500,
+                theme: "colored",
+            });
+        }
+    }, [error]);
 
     return (
         <div className='min-h-screen bg-gradient-to-b from-[#0D0F21] to-[#1A1C35] overflow-hidden'>
@@ -399,7 +428,7 @@ const Home = () => {
                     </div>
 
                     {/* Right Side - Registration Card */}
-                    <div className=" flex items-center justify-center bg-[#0D0F21]">
+                    <div className="min-h-[70vh] flex items-center justify-center bg-[#0D0F21]">
                         <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md mx-auto">
                             <div className="flex flex-col items-center mb-6">
                                 <img
@@ -410,11 +439,7 @@ const Home = () => {
                                 <h2 className="text-xl font-semibold text-gray-800">Registration</h2>
                             </div>
 
-                            {/* Show error or success */}
-                            {error && <p className="text-red-500 mb-2">{error}</p>}
-                            {user && <p className="text-green-500 mb-2">✅ Registered: {user.email}</p>}
-
-                            {/* Form */}
+                            {/* Registration form */}
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <input
                                     type="email"
@@ -466,7 +491,10 @@ const Home = () => {
                                 </Link>
                             </p>
                         </div>
+
+
                     </div>
+
                 </div>
             </div>
             {/* footer */}
@@ -492,6 +520,8 @@ const Home = () => {
                     </div>
                 </div>
             </footer>
+            {/* Toast Popup */}
+            <ToastContainer />
         </div>
 
     );

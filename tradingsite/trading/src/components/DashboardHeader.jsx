@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { FaArrowRight, FaChevronDown } from 'react-icons/fa';
 import { FiChevronDown, FiGlobe } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { getUserProfile } from "../Redux/reducer/authSlice";
 
 
 const languages = [
@@ -24,6 +26,33 @@ const DashboardHeader = () => {
     const [showLevelsDropdown, setShowLevelsDropdown] = useState(false);
     const [showAccountDropdown, setShowAccountDropdown] = useState(false);
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+
+    const dispatch = useDispatch();
+    const { user, loading } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        dispatch(getUserProfile());
+    }, [dispatch]);
+
+    // ✅ Get first letter from email (fallback "U")
+    const userInitial =
+        user?.name?.charAt(0).toUpperCase() ||
+        user?.email?.charAt(0).toUpperCase() ||
+        "U";
+
+    // ✅ Masked email (dashboard****@gmail.com style)
+    const maskEmail = (email) => {
+        if (!email) return "No Email";
+        const [localPart, domain] = email.split("@");
+        if (localPart.length <= 4) {
+            return localPart[0] + "****@" + domain;
+        }
+        return (
+            localPart.substring(0, 4) +
+            "****@" +
+            domain
+        );
+    };
 
     return (
         <div className=''>
@@ -199,16 +228,17 @@ const DashboardHeader = () => {
                                 onClick={() => setShowAccountDropdown(!showAccountDropdown)}
                             >
                                 <div className="bg-blue-500 text-white rounded-md w-8 h-8 flex items-center justify-center font-medium">
-                                    D
+                                    {loading ? "…" : userInitial}
                                 </div>
                                 <span className="ml-2 mr-1 text-sm hidden sm:inline">
-                                    dashboard****@gmail.com
+                                    {loading ? "Loading..." : maskEmail(user?.email)}
                                 </span>
                                 <FaChevronDown
-                                    className={`ml-1 text-xs transition-transform duration-200 ${showAccountDropdown ? 'rotate-180' : ''
+                                    className={`ml-1 text-xs transition-transform duration-200 ${showAccountDropdown ? "rotate-180" : ""
                                         }`}
                                 />
                             </button>
+
 
                             {showAccountDropdown && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-20 border border-gray-100 py-1">
@@ -232,9 +262,11 @@ const DashboardHeader = () => {
                     </div>
                 </div>
             </div>
-           
+
         </div>
     );
 };
 
 export default DashboardHeader;
+
+

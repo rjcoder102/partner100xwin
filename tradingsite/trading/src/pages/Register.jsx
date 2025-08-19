@@ -1,77 +1,118 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../Redux/reducer/authSlice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+        terms: false,
+    });
 
-    const dispatch = useDispatch();
+   
     const { loading, error, user } = useSelector((state) => state.auth);
 
+    // Handle input changes
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData({
+            ...formData,
+            [name]: type === "checkbox" ? checked : value,
+        });
+    };
+
+    // Handle submit
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!email || !password) {
-            alert("Please fill in both Email and Password.");
-            return;
-        }
-        dispatch(registerUser({ email, password }));
+        dispatch(registerUser({ email: formData.email, password: formData.password }));
     };
+
+    // Show popup & navigate
+    useEffect(() => {
+        if (user) {
+            toast.success("🎉 Successfully registered!", {
+                position: "top-center",
+                autoClose: 2000,
+                theme: "colored",
+            });
+
+            setTimeout(() => {
+                navigate("/dashboard");
+            }, 2200); // wait for toast before redirect
+        }
+    }, [user, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#0D0F21]">
-            <div className="bg-[#0D0F21] text-white w-full max-w-md p-8 rounded-lg shadow-lg">
-                <Link to="/" className="flex items-center justify-center mb-4">
+            <div className=" shadow-lg p-8 w-full max-w-md mx-auto">
+                <div className="flex flex-col items-center mb-6">
                     <img
-                        className="h-14"
                         src="https://quotex-partner.com/partners/media/logos/logo-letter.svg"
-                        alt="logo"
+                        alt="Logo"
+                        className="w-14 mb-3"
                     />
-                </Link>
-
-                <h2 className="text-2xl font-bold text-center mb-2">
-                    Quotex Affiliate Center
-                </h2>
-                <p className="text-gray-400 text-center mb-6">
-                    Enter your details to create your account
-                </p>
+                    <h2 className="text-xl font-semibold text-gray-50">Registration</h2>
+                </div>
 
                 {error && <p className="text-red-500 mb-2">{error}</p>}
-                {user && <p className="text-green-500 mb-2">Welcome {user.email}</p>}
 
-                <form className="space-y-4" onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                         type="email"
+                        name="email"
                         placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-3 rounded-md bg-gray-50 text-black border border-gray-700"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
                     />
+
                     <input
                         type="password"
+                        name="password"
                         placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-3 rounded-md bg-gray-50 text-black border border-gray-700"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
                     />
+
+                    <label className="flex items-center text-sm text-gray-50">
+                        <input
+                            type="checkbox"
+                            name="terms"
+                            checked={formData.terms}
+                            onChange={handleChange}
+                            className="mr-2"
+                        />
+                        I accept the{" "}
+                        <a href="#" className="text-blue-600 hover:underline ml-1">
+                            Terms and Conditions.
+                        </a>
+                    </label>
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-md font-semibold"
+                        className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
                         disabled={loading}
                     >
-                        {loading ? "Signing up..." : "Sign Up"}
+                        {loading ? "Signing up..." : "Register"}
                     </button>
                 </form>
 
-                <p className="mt-6 text-center text-gray-400">
+                <p className="text-center text-sm text-gray-50 mt-6">
                     Already have an account? <br />
-                    <Link to="/signin" className="text-blue-500 hover:underline">
-                        Sign In!
+                    <Link to="/signin" className="text-blue-600 hover:underline">
+                        Sign in
                     </Link>
                 </p>
             </div>
+
+            {/* Toast Popup */}
+            <ToastContainer />
         </div>
     );
 };

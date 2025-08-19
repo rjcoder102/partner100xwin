@@ -305,7 +305,7 @@ const Deposit = () => {
                 </div>
 
                 {/* Deposits Table */}
-                <div className="bg-white shadow-md rounded-xl overflow-hidden">
+                <div className="bg-white shadow-md rounded-xl overflow-hidden mb-8">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gray-50">

@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import authRoutes from "./src/routes/userRoute.js";
-
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 const app = express();
@@ -16,7 +16,7 @@ app.use(
         credentials: true,               
     })
 );
-
+app.use(cookieParser())
 
 // Routes
 app.use("/api/auth", authRoutes);
