@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { createHash, randomInt } from "crypto";
 import jwt from "jsonwebtoken";
 import { pool1, pool2 } from "../../config/db.js";
+import { log } from "console";
 
 const JWT_SECRET = process.env.JWT_SECRET || "suraj1234";
 
@@ -172,6 +173,120 @@ export const getDownlineUsers = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+export const getDipositeData = async (req, res) => {
+    const { id } = req.user;
+    const { filter } = req.query;
+    // filter = "day" | "week" | "month"
+
+    try {
+        // Get user info from pool1
+        const [userRows] = await pool1.query(
+            "SELECT id, email, code FROM users WHERE id = ?",
+            [id]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: "No user found" });
+        }
+
+        let userInfo = userRows[0];
+
+        // Base query
+        let baseQuery = "FROM depositrequests WHERE refral_code = ?";
+        let values = [userInfo.code];
+
+        // Apply filter on updated_at
+        if (filter === "day") {
+            baseQuery += " AND DATE(updated_at) = CURDATE()";
+        } else if (filter === "week") {
+            baseQuery += " AND YEARWEEK(updated_at, 1) = YEARWEEK(CURDATE(), 1)";
+        } else if (filter === "month") {
+            baseQuery += " AND YEAR(updated_at) = YEAR(CURDATE()) AND MONTH(updated_at) = MONTH(CURDATE())";
+        }
+
+        // 1️⃣ Get deposit rows
+        const [depositRows] = await pool2.query(
+            `SELECT * ${baseQuery}`,
+            values
+        );
+
+        // 2️⃣ Get total deposit amount
+        const [totalRows] = await pool2.query(
+            `SELECT SUM(amount) as totalAmount ${baseQuery}`,
+            values
+        );
+
+        const totalAmount = totalRows[0]?.totalAmount || 0;
+
+        res.json({
+            userInfo,
+            downlineDeposites: depositRows,  // ✅ list of deposits
+            totalAmount                     // ✅ total sum of amount
+        });
+    } catch (error) {
+        console.error("Error fetching downline deposits:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+export const getwithdrawlData = async (req, res) => {
+    const { id } = req.user;
+    const { filter } = req.query;
+    // filter = "day" | "week" | "month"
+
+    try {
+        // Get user info from pool1
+        const [userRows] = await pool1.query(
+            "SELECT id, email, code FROM users WHERE id = ?",
+            [id]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: "No user found" });
+        }
+
+        let userInfo = userRows[0];
+
+        // Base query
+        let baseQuery = "FROM withdrawrequests WHERE refral_code = ?";
+        let values = [userInfo.code];
+
+        // Apply filter on updated_at
+        if (filter === "day") {
+            baseQuery += " AND DATE(updated_at) = CURDATE()";
+        } else if (filter === "week") {
+            baseQuery += " AND YEARWEEK(updated_at, 1) = YEARWEEK(CURDATE(), 1)";
+        } else if (filter === "month") {
+            baseQuery += " AND YEAR(updated_at) = YEAR(CURDATE()) AND MONTH(updated_at) = MONTH(CURDATE())";
+        }
+
+        // 1️⃣ Fetch all rows
+        const [withdrowalRows] = await pool2.query(
+            `SELECT * ${baseQuery}`,
+            values
+        );
+
+        // 2️⃣ Fetch total sum of amount
+        const [totalRows] = await pool2.query(
+            `SELECT SUM(amount) as totalAmount ${baseQuery}`,
+            values
+        );
+
+        const totalAmount = totalRows[0]?.totalAmount || 0;
+
+        res.json({
+            userInfo,
+            downlineWithdrowal: withdrowalRows, // list of withdrawals
+            totalAmount        // sum of amount (filtered)
+        });
+    } catch (error) {
+        console.error("Error fetching downline users:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+
 
 
 
@@ -186,3 +301,6 @@ export const getDownlineUsers = async (req, res) => {
 
 
 // register link http://localhost:4200/register?refercode=1234567890
+
+
+

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getDownlineUsers, getUserProfile, loginUser, registerUser } from '../controller/userController.js';
+import { getDipositeData, getDownlineUsers, getUserProfile, getwithdrawlData, loginUser, registerUser } from '../controller/userController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 
 
@@ -9,6 +9,8 @@ router.post('/register', registerUser)
 router.post("/login", loginUser);
 router.get("/get-user", authMiddleware, getUserProfile);
 router.get("/get-downline-user", authMiddleware, getDownlineUsers);
+router.get("/get-downline-deposite", authMiddleware, getDipositeData);
+router.get("/get-downline-withdrowal", authMiddleware, getwithdrawlData);
 // router.post("/logout", logoutUser);
 
 export default router;
