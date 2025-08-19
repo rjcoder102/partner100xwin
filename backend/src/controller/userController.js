@@ -37,7 +37,7 @@ export const registerUser = async (req, res) => {
         const code = randomInt(1000000000, 9999999999).toString();
 
         // Use balance from request or default to 0
-        const initialBalance =  0;
+        const initialBalance = 0;
 
         // Insert user with balance
         const [result] = await pool1.query(
@@ -147,11 +147,9 @@ export const getUserProfile = async (req, res) => {
 
 export const getDownlineUsers = async (req, res) => {
     const { id } = req.user;
-    const { filter } = req.query;
-    // filter = "day" | "week" | "month"
+    const { filter, startDate, endDate } = req.query;
 
     try {
-        // Get user info from pool1
         const [rows] = await pool1.query(
             "SELECT id, email, code FROM users WHERE id = ?",
             [id]
@@ -162,18 +160,18 @@ export const getDownlineUsers = async (req, res) => {
         }
 
         let userInfo = rows[0];
-
-        // Base query
         let query = "SELECT * FROM users WHERE refral_code = ?";
         let values = [userInfo.code];
 
-        // Apply filter on created_at
         if (filter === "day") {
-            query += " AND DATE(created_at) = CURDATE()"; // Today only
+            query += " AND DATE(created_at) = CURDATE()";
         } else if (filter === "week") {
-            query += " AND YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)"; // Current week (Monday-Sunday)
+            query += " AND YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)";
         } else if (filter === "month") {
-            query += " AND YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())"; // Current month
+            query += " AND YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())";
+        } else if (startDate && endDate) {
+            query += " AND DATE(created_at) BETWEEN ? AND ?";
+            values.push(startDate, endDate);
         }
 
         const [downlineRows] = await pool2.query(query, values);
@@ -184,13 +182,12 @@ export const getDownlineUsers = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
 export const getDipositeData = async (req, res) => {
     const { id } = req.user;
-    const { filter } = req.query;
-    // filter = "day" | "week" | "month"
+    const { filter, startDate, endDate } = req.query;
 
     try {
-        // Get user info from pool1
         const [userRows] = await pool1.query(
             "SELECT id, email, code FROM users WHERE id = ?",
             [id]
@@ -201,38 +198,27 @@ export const getDipositeData = async (req, res) => {
         }
 
         let userInfo = userRows[0];
-
-        // Base query
-        let baseQuery = "FROM depositrequests WHERE refral_code = ?";
+        let baseQuery = "FROM depositrequests WHERE refral_code = ? AND status = 1";
         let values = [userInfo.code];
 
-        // Apply filter on updated_at
         if (filter === "day") {
             baseQuery += " AND DATE(updated_at) = CURDATE()";
         } else if (filter === "week") {
             baseQuery += " AND YEARWEEK(updated_at, 1) = YEARWEEK(CURDATE(), 1)";
         } else if (filter === "month") {
             baseQuery += " AND YEAR(updated_at) = YEAR(CURDATE()) AND MONTH(updated_at) = MONTH(CURDATE())";
+        } else if (startDate && endDate) {
+            baseQuery += " AND DATE(updated_at) BETWEEN ? AND ?";
+            values.push(startDate, endDate);
         }
 
-        // 1️⃣ Get deposit rows
-        const [depositRows] = await pool2.query(
-            `SELECT * ${baseQuery}`,
-            values
-        );
-
-        // 2️⃣ Get total deposit amount
-        const [totalRows] = await pool2.query(
-            `SELECT SUM(amount) as totalAmount ${baseQuery}`,
-            values
-        );
-
-        const totalAmount = totalRows[0]?.totalAmount || 0;
+        const [depositRows] = await pool2.query(`SELECT * ${baseQuery}`, values);
+        const [totalRows] = await pool2.query(`SELECT SUM(amount) as totalAmount ${baseQuery}`, values);
 
         res.json({
             userInfo,
-            downlineDeposites: depositRows,  // ✅ list of deposits
-            totalAmount                     // ✅ total sum of amount
+            downlineDeposites: depositRows,
+            totalAmount: totalRows[0]?.totalAmount || 0
         });
     } catch (error) {
         console.error("Error fetching downline deposits:", error);
@@ -242,11 +228,9 @@ export const getDipositeData = async (req, res) => {
 
 export const getwithdrawlData = async (req, res) => {
     const { id } = req.user;
-    const { filter } = req.query;
-    // filter = "day" | "week" | "month"
+    const { filter, startDate, endDate } = req.query;
 
     try {
-        // Get user info from pool1
         const [userRows] = await pool1.query(
             "SELECT id, email, code FROM users WHERE id = ?",
             [id]
@@ -257,45 +241,122 @@ export const getwithdrawlData = async (req, res) => {
         }
 
         let userInfo = userRows[0];
-
-        // Base query
-        let baseQuery = "FROM withdrawrequests WHERE refral_code = ?";
+        let baseQuery = "FROM withdrawrequests WHERE refral_code = ? AND status = 1";
         let values = [userInfo.code];
 
-        // Apply filter on updated_at
         if (filter === "day") {
             baseQuery += " AND DATE(updated_at) = CURDATE()";
         } else if (filter === "week") {
             baseQuery += " AND YEARWEEK(updated_at, 1) = YEARWEEK(CURDATE(), 1)";
         } else if (filter === "month") {
             baseQuery += " AND YEAR(updated_at) = YEAR(CURDATE()) AND MONTH(updated_at) = MONTH(CURDATE())";
+        } else if (startDate && endDate) {
+            baseQuery += " AND DATE(updated_at) BETWEEN ? AND ?";
+            values.push(startDate, endDate);
         }
 
-        // 1️⃣ Fetch all rows
-        const [withdrowalRows] = await pool2.query(
-            `SELECT * ${baseQuery}`,
-            values
-        );
-
-        // 2️⃣ Fetch total sum of amount
-        const [totalRows] = await pool2.query(
-            `SELECT SUM(amount) as totalAmount ${baseQuery}`,
-            values
-        );
-
-        const totalAmount = totalRows[0]?.totalAmount || 0;
+        const [withdrawalRows] = await pool2.query(`SELECT * ${baseQuery}`, values);
+        const [totalRows] = await pool2.query(`SELECT SUM(amount) as totalAmount ${baseQuery}`, values);
 
         res.json({
             userInfo,
-            downlineWithdrowal: withdrowalRows, // list of withdrawals
-            totalAmount        // sum of amount (filtered)
+            downlineWithdrowal: withdrawalRows,
+            totalAmount: totalRows[0]?.totalAmount || 0
         });
     } catch (error) {
-        console.error("Error fetching downline users:", error);
+        console.error("Error fetching downline withdrawals:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
 
+
+export const updateDealyShare = async (req, res) => {
+    const { id } = req.user;
+
+    try {
+        const [userRows] = await pool1.query(
+            "SELECT * FROM users WHERE id = ?",
+            [id]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: "No user found" });
+        }
+
+        let userInfo = userRows[0];
+        let startDate = userInfo.setelment_date;
+
+        // ✅ Single base query with static startDate filter
+        let depositeQuery = `
+            FROM depositrequests 
+            WHERE refral_code = ? 
+            AND status = 1 
+            AND DATE(updated_at) BETWEEN ? AND CURDATE()
+        `;
+        let depositeValues = [userInfo.code, startDate];
+
+        // ✅ Get deposits + total in one line each
+        const [depositeRows] = await pool2.query(
+            `SELECT * ${depositeQuery} ORDER BY updated_at DESC`,
+            depositeValues
+        );
+
+        console.log("depositeRows", depositeRows);
+
+
+        const [totalDeposite] = await pool2.query(
+            `SELECT SUM(amount) AS totalAmount ${depositeQuery}`,
+            depositeValues
+        );
+
+        // ✅ Single base query with static startDate filter for withdrowal amount
+        let withdrawalQuery = `
+            FROM withdrawrequests 
+            WHERE refral_code = ? 
+            AND status = 1 
+            AND DATE(updated_at) BETWEEN ? AND CURDATE()
+        `;
+        let withdrawalValues = [userInfo.code, startDate];
+
+        // ✅ Get deposits + total in one line each
+        const [withdrawalRows] = await pool2.query(
+            `SELECT * ${withdrawalQuery} ORDER BY updated_at DESC`,
+            withdrawalValues
+        );
+
+        const [totalwithdrawal] = await pool2.query(
+            `SELECT SUM(amount) AS totalAmount ${withdrawalQuery}`,
+            withdrawalValues
+        );
+
+        // ✅ Get total balance of all users with same refral_code
+        const [currentBalanceRows] = await pool2.query(
+            `SELECT SUM(balance) AS totalBalance FROM users WHERE refral_code = ?`,
+            [userInfo.code]
+        );
+
+
+        let totalDepositeAmount = totalDeposite[0]?.totalAmount || 0;
+        let totalWithdrowalAmount = totalwithdrawal[0]?.totalAmount || 0;
+        let totalBalance = Number(currentBalanceRows[0]?.totalBalance) || 0;
+
+
+        const profit = totalDepositeAmount - totalWithdrowalAmount - totalBalance;
+
+
+        res.json({
+            userInfo,
+            totalDepositeAmount,
+            totalWithdrowalAmount,
+            totalBalance,
+            profit
+
+        });
+    } catch (error) {
+        console.error("Error fetching downline deposits:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
 
 
