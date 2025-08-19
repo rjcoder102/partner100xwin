@@ -4,9 +4,10 @@ import {
     FaChartBar, FaLink, FaGift, FaBook, FaTrophy, FaCrown,
     FaTelegramPlane, FaHeadset, FaUsers, FaUserFriends
 } from "react-icons/fa";
-import { MdWindow } from "react-icons/md"; // ✅ Added missing import
+import { MdWindow } from "react-icons/md";
 import LinksPage from "../components/LinksPage";
 import Deposit from "../components/Deposit";
+import Withdrawl from "./Withdrawl";
 
 const Dashboard = () => {
     const [activePage, setActivePage] = useState("Dashboard");
@@ -16,7 +17,7 @@ const Dashboard = () => {
         { label: "Dashboard", icon: <MdWindow /> },
         { label: "Links", icon: <FaLink /> },
         { label: "Deposit", icon: <FaChartBar /> },
-        { label: "Promo materials", icon: <FaGift /> },
+        { label: "Withdrawl", icon: <FaGift /> },
         { label: "Promocodes", icon: <FaBook /> },
         { label: "Postbook", icon: <FaBook /> },
         { label: "Contests", icon: <FaTrophy /> },
@@ -40,12 +41,9 @@ const Dashboard = () => {
                 return (
                     <LinksPage />
                 );
-            case "Promo materials":
+            case "Withdrawl":
                 return (
-                    <div className="bg-white p-6 rounded-lg shadow">
-                        <h2 className="text-xl font-bold mb-4">🎨 Promo Materials</h2>
-                        <p>Download banners, creatives, and landing pages.</p>
-                    </div>
+                    <Withdrawl />
                 );
             case "Support":
                 return (

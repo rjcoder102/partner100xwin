@@ -1,6 +1,4 @@
 
-
-
 // import User from "../model/userModel.js";
 import bcrypt from "bcryptjs";
 import { createHash, randomInt } from "crypto";
@@ -12,51 +10,64 @@ const JWT_SECRET = process.env.JWT_SECRET || "suraj1234";
 
 // ✅ Register User
 export const registerUser = async (req, res) => {
-    const { email, password } = req.body;
-
     try {
-        // check if user exists
-        const [existing] = await pool1.query("SELECT * FROM users WHERE email = ?", [email]);
+        const { email, password } = req.body;
+        console.log("Register request:", email, password);
+
+        // Validate input
+        if (!email || !password) {
+            return res
+                .status(400)
+                .json({ message: "Email and password are required" });
+        }
+
+        // Check if user exists
+        const [existing] = await pool1.query(
+            "SELECT * FROM users WHERE email = ?",
+            [email]
+        );
         if (existing.length > 0) {
             return res.status(400).json({ message: "User already exists" });
         }
 
-        // hash password with MD5
+        // Hash password (⚠️ bcrypt is better in production)
         const hashedPassword = createHash("md5").update(password).digest("hex");
 
-        // generate unique 10-digit code
+        // Generate unique 10-digit code
         const code = randomInt(1000000000, 9999999999).toString();
 
+        // Use balance from request or default to 0
+        const initialBalance =  0;
 
-        // insert user
+        // Insert user with balance
         const [result] = await pool1.query(
-            "INSERT INTO users (email, password, code) VALUES (?, ?, ?)",
-            [email, hashedPassword, code]
+            "INSERT INTO users (email, password, code, balance) VALUES (?, ?, ?, ?)",
+            [email, hashedPassword, code, initialBalance]
         );
 
         const userId = result.insertId;
 
-        // generate JWT
+        // Generate JWT
         const token = jwt.sign({ id: userId, email }, process.env.JWT_SECRET, {
             expiresIn: "1h",
         });
 
-        // store token in cookie
+        // Store token in cookie
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             message: "User registered successfully",
-            user: { id: userId, email },
+            user: { id: userId, email, balance: initialBalance },
             token, // optional
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+        console.error("Register error:", error);
+        return res.status(500).json({ message: "Server error" });
     }
 };
 

@@ -10,6 +10,8 @@ import conversion from "../assets/conversion.svg";
 import geographical from "../assets/geographical.svg";
 import collaboration from '../assets/collaboration.svg';
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { registerUser } from "../Redux/reducer/authSlice";
 
 const cards = [
     {
@@ -80,6 +82,10 @@ const Home = () => {
         terms: false,
     });
 
+    const dispatch = useDispatch();
+    const { loading, error, user } = useSelector((state) => state.auth);
+
+    // Input handler
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData({
@@ -88,13 +94,10 @@ const Home = () => {
         });
     };
 
+    // Submit handler
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData.terms) {
-            alert("You must accept the Terms and Conditions");
-            return;
-        }
-        alert("Form submitted!");
+        dispatch(registerUser({ email: formData.email, password: formData.password }));
     };
 
     return (
@@ -319,43 +322,6 @@ const Home = () => {
                     {/* Left Side (Graphic) */}
                     <div className="flex justify-center">
                         <div className="relative w-80 h-80">
-                            {/* <div className="absolute inset-0 flex items-center justify-center">
-                                <svg
-                                    className="w-full h-full"
-                                    viewBox="0 0 300 300"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <circle
-                                        cx="150"
-                                        cy="150"
-                                        r="140"
-                                        stroke="url(#gradient)"
-                                        strokeWidth="2"
-                                        fill="none"
-                                    />
-                                    <defs>
-                                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor="#005eff" />
-                                            <stop offset="100%" stopColor="#00ffea" />
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-                            </div> */}
-
-
-                            {/* Icons around the circle */}
-                            {/* <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
-                                <FaUser className="text-white text-2xl bg-[#005eff] p-2 rounded-full" />
-                            </div>
-                            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
-                                <FaDollarSign className="text-white text-2xl bg-green-600 p-2 rounded-full" />
-                            </div>
-                            <div className="absolute left-0 top-1/2 transform -translate-y-1/2">
-                                <FaUser className="text-white text-2xl bg-[#005eff] p-2 rounded-full" />
-                            </div>
-                            <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
-                                <FaDollarSign className="text-white text-2xl bg-green-600 p-2 rounded-full" />
-                            </div> */}
                         </div>
                         <img src={collaboration} alt="" />
                     </div>
@@ -413,7 +379,7 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className="bg-[#0D0F21] flex items-center justify-center px-4">
+            <div className="bg-[#0D0F21] py-10 flex items-center justify-center px-4">
                 <div className="grid md:grid-cols-2 gap-12 max-w-6xl w-full">
                     {/* Left Side */}
                     <div className="flex flex-col justify-center text-white">
@@ -433,65 +399,73 @@ const Home = () => {
                     </div>
 
                     {/* Right Side - Registration Card */}
-                    <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md mx-auto">
-                        <div className="flex flex-col items-center mb-6">
-                            <img
-                                src="https://quotex-partner.com/partners/media/logos/logo-letter.svg"
-                                alt="Logo"
-                                className="w-14 mb-3"
-                            />
-                            <h2 className="text-xl font-semibold text-gray-800">Registration</h2>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-
-                            <label className="flex items-center text-sm text-gray-600">
-                                <input
-                                    type="checkbox"
-                                    name="terms"
-                                    checked={formData.terms}
-                                    onChange={handleChange}
-                                    className="mr-2"
+                    <div className=" flex items-center justify-center bg-[#0D0F21]">
+                        <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md mx-auto">
+                            <div className="flex flex-col items-center mb-6">
+                                <img
+                                    src="https://quotex-partner.com/partners/media/logos/logo-letter.svg"
+                                    alt="Logo"
+                                    className="w-14 mb-3"
                                 />
-                                I accept the{" "}
-                                <a href="#" className="text-blue-600 hover:underline ml-1">
-                                    Terms and Conditions.
-                                </a>
-                            </label>
+                                <h2 className="text-xl font-semibold text-gray-800">Registration</h2>
+                            </div>
 
-                            <button
-                                type="submit"
-                                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
-                            >
-                                Register
-                            </button>
-                        </form>
+                            {/* Show error or success */}
+                            {error && <p className="text-red-500 mb-2">{error}</p>}
+                            {user && <p className="text-green-500 mb-2">✅ Registered: {user.email}</p>}
 
-                        <p className="text-center text-sm text-gray-600 mt-6">
-                            Already have an account?{" "} <br/>
-                            <Link to="/signin" className="text-blue-600 hover:underline">
-                                Sign in
-                            </Link>
-                        </p>
+                            {/* Form */}
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
+                                />
+
+                                <input
+                                    type="password"
+                                    name="password"
+                                    placeholder="Password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    required
+                                />
+
+                                <label className="flex items-center text-sm text-gray-600">
+                                    <input
+                                        type="checkbox"
+                                        name="terms"
+                                        checked={formData.terms}
+                                        onChange={handleChange}
+                                        className="mr-2"
+                                    />
+                                    I accept the{" "}
+                                    <a href="#" className="text-blue-600 hover:underline ml-1">
+                                        Terms and Conditions.
+                                    </a>
+                                </label>
+
+                                <button
+                                    type="submit"
+                                    className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+                                    disabled={loading}
+                                >
+                                    {loading ? "Registering..." : "Register"}
+                                </button>
+                            </form>
+
+                            <p className="text-center text-sm text-gray-600 mt-6">
+                                Already have an account? <br />
+                                <Link to="/signin" className="text-blue-600 hover:underline">
+                                    Sign in
+                                </Link>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
