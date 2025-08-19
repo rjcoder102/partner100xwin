@@ -110,7 +110,7 @@ export const getUserProfile = async (req, res) => {
     try {
         // fetch user by ID from decoded token (middleware sets req.user.id)
         const [rows] = await pool1.query(
-            "SELECT id, email FROM users WHERE id = ?",
+            "SELECT * FROM users WHERE id = ?",
             [id]
         );
         // const [user] = await pool2.query(
@@ -133,8 +133,56 @@ export const getUserProfile = async (req, res) => {
     }
 };
 
+export const getDownlineUsers = async (req, res) => {
+    const { id } = req.user;
+    const { filter } = req.query;
+    // filter = "day" | "week" | "month"
+
+    try {
+        // Get user info from pool1
+        const [rows] = await pool1.query(
+            "SELECT id, email, code FROM users WHERE id = ?",
+            [id]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "No user found" });
+        }
+
+        let userInfo = rows[0];
+
+        // Base query
+        let query = "SELECT * FROM users WHERE refral_code = ?";
+        let values = [userInfo.code];
+
+        // Apply filter on created_at
+        if (filter === "day") {
+            query += " AND DATE(created_at) = CURDATE()"; // Today only
+        } else if (filter === "week") {
+            query += " AND YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)"; // Current week (Monday-Sunday)
+        } else if (filter === "month") {
+            query += " AND YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE())"; // Current month
+        }
+
+        const [downlineRows] = await pool2.query(query, values);
+
+        res.json({ userInfo, downlineRows });
+    } catch (error) {
+        console.error("Error fetching downline users:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+
 // // ✅ Logout User
 // export const logoutUser = (req, res) => {
 //     res.clearCookie("token");
 //     res.json({ message: "Logged out successfully" });
 // };
+
+
+
+
+
+// register link http://localhost:4200/register?refercode=1234567890
