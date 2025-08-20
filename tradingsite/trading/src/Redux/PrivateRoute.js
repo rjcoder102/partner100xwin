@@ -22,7 +22,7 @@ const PrivateRoute = () => {
         setOk(!!processedUserInfo);
     }, [processedUserInfo]);
 
-    return <Outlet /> 
+    return <Outlet />
 };
 
 export default PrivateRoute;
