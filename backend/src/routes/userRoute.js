@@ -1,6 +1,8 @@
 import express from 'express';
-import { getDipositeData, getDownlineUsers, getUserProfile, getwithdrawlData, loginUser, logoutUser, registerUser, resendOtp, updateDealyShare, verifyOtp } from '../controller/userController.js';
+import { gameHistory, getDipositeData, getDownlineUsers, getUserProfile, getwithdrawlData, loginUser, logoutUser, registerUser, resendOtp, updateDealyShare, verifyOtp } from '../controller/userController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
+import { updateAllUserLevels } from '../controller/updateLevelController.js';
+import { createWithdrawalRequest } from '../controller/userWithdrowalController.js';
 
 
 const router = express.Router();
@@ -14,6 +16,9 @@ router.get("/get-downline-withdrowal", authMiddleware, getwithdrawlData);
 router.put("/update-deley-shere", authMiddleware, updateDealyShare);
 router.post("/otp-verify", authMiddleware, verifyOtp);
 router.post("/resend-otp", authMiddleware, resendOtp);
+router.post("/user-withdrowal", authMiddleware, createWithdrawalRequest);
+router.get("/get-bet-history", gameHistory);
+// router.post("/update-leve", updateAllUserLevels);
 router.post("/logout", logoutUser);
 
 export default router;

@@ -6,9 +6,12 @@ import jwt from "jsonwebtoken";
 import { pool1, pool2 } from "../../config/db.js";
 import { log } from "console";
 import nodemailer from "nodemailer";
+import axios from "axios"
 
 
 const JWT_SECRET = process.env.JWT_SECRET || "suraj1234";
+const apiUrl = "https://zapcore.live/api";
+const key = "2PII4oCtVpvucFBoKYzKBa6MFpn4V1qO";
 
 // ✅ Register User
 export const registerUser = async (req, res) => {
@@ -49,6 +52,9 @@ export const registerUser = async (req, res) => {
 
         const userId = result.insertId;
 
+        console.log("userId", userId);
+
+
         // Generate JWT
         const token = jwt.sign({ id: userId, email }, process.env.JWT_SECRET, {
             expiresIn: "1h",
@@ -64,8 +70,8 @@ export const registerUser = async (req, res) => {
 
         return res.status(201).json({
             message: "User registered successfully",
-            user,
-            success:true,
+            token,
+            success: true,
         });
     } catch (error) {
         console.error("Register error:", error);
@@ -114,7 +120,8 @@ export const resendOtp = async (req, res) => {
 
         res.json({
             message: "A new OTP has been sent to your email.",
-            success:true,
+            user,
+            success: true,
         });
 
     } catch (error) {
@@ -192,8 +199,8 @@ export const loginUser = async (req, res) => {
         res.json({
             message: "Login successful. OTP sent to your email.",
             user,
-            success:true,
-            token
+            token,
+            success: true,
         });
     } catch (error) {
         console.error("Login error:", error);
@@ -202,7 +209,6 @@ export const loginUser = async (req, res) => {
 };
 
 // otp verify
-
 export const verifyOtp = async (req, res) => {
     const { id, email } = req.user;
     const { otp } = req.body;
@@ -239,9 +245,9 @@ export const verifyOtp = async (req, res) => {
 
         res.json({
             message: "OTP verified successfully. Login complete.",
-            success:true,
+            success: true,
             user,
-          
+
         });
 
     } catch (error) {
@@ -264,7 +270,7 @@ export const getUserProfile = async (req, res) => {
         //     [email]
         // );
 
-        console.log("User profile fetched:");
+        const user = rows[0]
 
 
         if (rows.length === 0) {
@@ -272,7 +278,11 @@ export const getUserProfile = async (req, res) => {
         }
 
         // ✅ user found
-        res.json(rows[0]);
+        res.json({
+            message: "Fatch User Details successfully",
+            user,
+            success: true
+        });
     } catch (error) {
         console.error("Error fetching user profile:", error);
         res.status(500).json({ message: "Server error" });
@@ -403,7 +413,6 @@ export const getwithdrawlData = async (req, res) => {
     }
 };
 
-
 export const updateDealyShare = async (req, res) => {
     const { id } = req.user;
 
@@ -435,7 +444,7 @@ export const updateDealyShare = async (req, res) => {
             depositeValues
         );
 
-        console.log("depositeRows", depositeRows);
+        // console.log("depositeRows", depositeRows);
 
 
         const [totalDeposite] = await pool2.query(
@@ -477,18 +486,97 @@ export const updateDealyShare = async (req, res) => {
 
         const profit = totalDepositeAmount - totalWithdrowalAmount - totalBalance;
 
+        let profitShare = 0;
+        let percentage = 0;
+
+        if (userInfo.leve === 1) {
+            percentage = 40;
+        } else if (userInfo.leve === 2) {
+            percentage = 50;
+        } else if (userInfo.leve === 3) {
+            percentage = 60;
+        }
+
+        profitShare = (profit * percentage) / 100;
+
+        await pool1.query("UPDATE users SET shere_wallet = ? WHERE id = ?", [
+            profitShare,
+            userInfo.id,
+        ]);
 
         res.json({
             userInfo,
             totalDepositeAmount,
             totalWithdrowalAmount,
             totalBalance,
-            profit
+            profit,
+            profitShare,
 
         });
     } catch (error) {
         console.error("Error fetching downline deposits:", error);
         res.status(500).json({ message: "Server error" });
+    }
+};
+
+export const gameHistory = async (req, res) => {
+
+    try {
+        // const { page = 1, size = 50 } = req.body
+        // const playerid = req.userData.user.id;
+        // const [userRows] = await pool1.query(
+        //     "SELECT * FROM users WHERE id = ?",
+        //     [id]
+        // );
+
+        const page = 1
+        const size = 50
+
+        const playerid = 1825
+
+        if (!page || !size) {
+            return res.status(400).json({
+                message: 'Undefined page & size',
+                status: false,
+            });
+        }
+
+        const payload = {
+            playerid,
+            page,
+            size,
+            uid: "e333695bcff28acdbecc641ae6ee2b23",
+            key
+        }
+
+
+        const response = await axios.post(`${apiUrl}/history`, payload);
+
+
+
+        if (response.data.status) {
+            return res.status(200).json({
+                message: 'get game type successfully.',
+                status: true,
+                data: response.data
+            });
+
+
+
+        } else {
+            return res.status(500).json({
+                message: 'Internal server error',
+                status: false,
+            });
+        }
+
+    } catch (error) {
+        // console.error(error); 
+        return res.status(500).json({
+            message: 'Internal server error',
+            status: false,
+            error: error.message,
+        });
     }
 };
 
