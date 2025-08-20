@@ -9,7 +9,6 @@ export const fetchDownlineUsers = createAsyncThunk(
         try {
             const res = await api.get(
                 `/auth/get-downline-user?filter=${filter || ""}`,{withCredentials:true}
-               
             );
             console.log("📌 Downline API response:", res.data);
             return res.data;
@@ -24,7 +23,7 @@ export const fetchDownlineUsers = createAsyncThunk(
 const downlineSlice = createSlice({
     name: "downline",
     initialState: {
-        users: [], // ✅ always array
+        users: [],
         loading: false,
         error: null,
     },
@@ -37,7 +36,6 @@ const downlineSlice = createSlice({
             })
             .addCase(fetchDownlineUsers.fulfilled, (state, action) => {
                 state.loading = false;
-                // ✅ ensure payload is always an array
                 state.users = Array.isArray(action.payload) ? action.payload : [];
             })
             .addCase(fetchDownlineUsers.rejected, (state, action) => {
