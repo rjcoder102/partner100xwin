@@ -1,5 +1,5 @@
 import express from 'express';
-import { getDipositeData, getDownlineUsers, getUserProfile, getwithdrawlData, loginUser, logoutUser, registerUser, updateDealyShare, verifyOtp } from '../controller/userController.js';
+import { getDipositeData, getDownlineUsers, getUserProfile, getwithdrawlData, loginUser, logoutUser, registerUser, resendOtp, updateDealyShare, verifyOtp } from '../controller/userController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 
 
@@ -13,6 +13,7 @@ router.get("/get-downline-deposite", authMiddleware, getDipositeData);
 router.get("/get-downline-withdrowal", authMiddleware, getwithdrawlData);
 router.put("/update-deley-shere", authMiddleware, updateDealyShare);
 router.post("/otp-verify", authMiddleware, verifyOtp);
+router.post("/resend-otp", authMiddleware, resendOtp);
 router.post("/logout", logoutUser);
 
 export default router;
