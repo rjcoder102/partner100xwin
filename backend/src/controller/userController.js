@@ -64,8 +64,8 @@ export const registerUser = async (req, res) => {
 
         return res.status(201).json({
             message: "User registered successfully",
-            user: { id: userId, email, balance: initialBalance },
-            token, // optional
+            user,
+            success:true,
         });
     } catch (error) {
         console.error("Register error:", error);
@@ -114,6 +114,7 @@ export const resendOtp = async (req, res) => {
 
         res.json({
             message: "A new OTP has been sent to your email.",
+            success:true,
         });
 
     } catch (error) {
@@ -161,7 +162,7 @@ export const loginUser = async (req, res) => {
             port: 587,
             secure: false,
             auth: {
-                user: process.env.SMTP_USER, // your email
+                user: process.env.SMTP_USER, // your email                          
                 pass: process.env.SMTP_PASS, // your app password
             },
         });
@@ -190,8 +191,8 @@ export const loginUser = async (req, res) => {
 
         res.json({
             message: "Login successful. OTP sent to your email.",
-            user: { id: user.id, email: user.email },
-            token, // optional
+            user,
+            success:true,
         });
     } catch (error) {
         console.error("Login error:", error);
@@ -237,8 +238,9 @@ export const verifyOtp = async (req, res) => {
 
         res.json({
             message: "OTP verified successfully. Login complete.",
-            user: { id: user.id, email: user.email },
-            token,
+            success:true,
+            user,
+          
         });
 
     } catch (error) {

@@ -1,38 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { verifyOtp, resendOtp } from "../Redux/reducer/authSlice"; // ⬅️ import resendOtp
 
 const OtpPage = () => {
     const [otp, setOtp] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
-    const email = location.state?.email; 
+    const email = location.state?.email;
+    const [resendMsg, setResendMsg] = useState("");
+
+
+    const dispatch = useDispatch();
+    const { loading, error, success } = useSelector((state) => state.auth);
 
     const handleSubmit = (e) => {
+        console.log("ewkjhg");
+        
         e.preventDefault();
-        setLoading(true);
-        setError("");
-        setSuccess("");
 
-        // ✅ Replace with API call for OTP validation
-        setTimeout(() => {
-            if (otp === "123456") {
-                setSuccess("OTP Verified Successfully!");
-                navigate("/dashboard");
-            } else {
-                setError("Invalid OTP, please try again.");
-            }
-            setLoading(false);
-        }, 1500);
+        if (!otp || otp.length < 6) {
+            setLocalError("Please enter a valid 6-digit OTP.");
+            return;
+        }
+
+        setLocalError(""); // clear local error
+        dispatch(verifyOtp({ otp }))
+            .unwrap()
+            .then((res) => {
+                if (res.success) {
+                    navigate("/dashboard");
+                }
+            })
+            .catch((err) => {
+                console.log(err.message);
+                
+            });
     };
 
-    const handleResend = () => {
-        // ✅ Replace with resend OTP API
-        setSuccess(`A new OTP has been sent to ${email || "your email"}.`);
-        setError("");
-    };
+    // ✅ Proper resendOtp integration
+ const handleResend = () => {
+    setResendMsg(""); // clear old message
+    dispatch(resendOtp())
+        .unwrap()
+        .then((res) => {
+            setResendMsg(res.message || "OTP has been resent successfully.");
+        })
+        .catch((err) => {
+            setResendMsg(err || "Failed to resend OTP. Try again.");
+        });
+};
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#0D0F21] px-4">
@@ -47,12 +64,12 @@ const OtpPage = () => {
                 <div className="text-center">
                     <h2 className="text-2xl font-bold mb-2">Quotex Affiliate Center</h2>
                     <p className="text-gray-400 mb-6">
-                        Please enter the PIN-code sent to <br />  your email
+                        Please enter the PIN-code sent to <br /> your email
                     </p>
                 </div>
 
-                {error && <p className="text-red-500 mb-2">{error}</p>}
-                {success && <p className="text-green-500 mb-2">{success}</p>}
+                {error && <p className="text-red-500 mb-2">{resendMsg}</p>}
+                {success && <p className="text-green-500 mb-2">{resendMsg}</p>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
@@ -68,6 +85,7 @@ const OtpPage = () => {
                             type="button"
                             onClick={handleResend}
                             className="text-blue-400 hover:underline text-sm"
+                            disabled={loading}
                         >
                             Resend PIN-code
                         </button>
@@ -78,7 +96,7 @@ const OtpPage = () => {
                         className="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-md font-semibold transition"
                         disabled={loading}
                     >
-                        {loading ? "Verifying..." : "Sign In"}
+                        {loading ? "Processing..." : "Sign In"}
                     </button>
                 </form>
 
