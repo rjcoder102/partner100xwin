@@ -73,6 +73,55 @@ export const registerUser = async (req, res) => {
     }
 };
 
+// send otp function
+export const resendOtp = async (req, res) => {
+    const { email } = req.user;
+
+    try {
+        // find user by email
+        const [rows] = await pool1.query("SELECT * FROM users WHERE email = ?", [email]);
+        if (rows.length === 0) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        const user = rows[0];
+
+        // ✅ Generate new OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // ✅ Update OTP in DB
+        await pool1.query("UPDATE users SET otp = ? WHERE id = ?", [otp, user.id]);
+
+        // ✅ Setup nodemailer transporter
+        const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+            },
+        });
+
+        // ✅ Send OTP email
+        await transporter.sendMail({
+            from: `"Your App" <${process.env.SMTP_USER}>`,
+            to: user.email,
+            subject: "Your Resent OTP",
+            text: `Your new OTP code is: ${otp}`,
+            html: `<h3>Your New OTP Code</h3><p><b>${otp}</b></p>`,
+        });
+
+        res.json({
+            message: "A new OTP has been sent to your email.",
+        });
+
+    } catch (error) {
+        console.error("Resend OTP error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
 // ✅ Login User
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
