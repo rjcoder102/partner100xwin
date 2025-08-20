@@ -77,6 +77,9 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
+    console.log("ewnjknfw", email);
+
+
     try {
         // find user by email
         const [rows] = await pool1.query("SELECT * FROM users WHERE email = ?", [email]);
@@ -91,7 +94,7 @@ export const loginUser = async (req, res) => {
 
         // check password
         if (hashedPassword !== user.password) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(400).json({ message: "Wrong Password" });
         }
 
         // ✅ Generate OTP (6-digit random)
