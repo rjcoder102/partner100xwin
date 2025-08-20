@@ -197,7 +197,6 @@ export const loginUser = async (req, res) => {
 };
 
 // otp verify
-
 export const verifyOtp = async (req, res) => {
     const { id, email } = req.user;
     const { otp } = req.body;
@@ -241,6 +240,60 @@ export const verifyOtp = async (req, res) => {
     } catch (error) {
         console.error("OTP verification error:", error);
         res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+// ✅ Function to update user levels
+export const updateUserLevels = async (req, res) => {
+    const { id, email } = req.user
+    console.log("id", id, email);
+
+    try {
+        // Get all users
+        const [users] = await pool1.query(
+            "SELECT id, email, code FROM users WHERE id = ?",
+            [id]
+        );
+
+        const userInfo = users[0]
+
+        console.log("users", userInfo);
+
+
+        const [downlineUser] = await pool2.query(`SELECT * FROM users WHERE refral_code = ?`, [userInfo.code])
+
+
+        // Count downline users (refral_code = user.code)
+        const [downlines] = await pool2.query(
+            "SELECT COUNT(*) as total FROM users WHERE refral_code = ?",
+            [userInfo.code]
+        );
+
+        const count = downlines[0].total;
+
+        console.log("count", count);
+
+        let newLevel = 0;
+
+        if (count > 300) {
+            newLevel = 3;
+        } else if (count > 200) {
+            newLevel = 2;
+        } else if (count > 100) {
+            newLevel = 1;
+        }
+
+        // Update level only if changed
+        // if (newLevel !== user.leve) {
+        //     await pool1.query("UPDATE users SET leve = ? WHERE id = ?", [newLevel, user.id]);
+        //     console.log(`✅ Updated user ${user.email} to level ${newLevel}`);
+        // }
+
+
+        res.json({ message: "update level successfully", users, downlineUser })
+    } catch (error) {
+        console.error("Error updating user levels:", error);
     }
 };
 
@@ -397,7 +450,6 @@ export const getwithdrawlData = async (req, res) => {
     }
 };
 
-
 export const updateDealyShare = async (req, res) => {
     const { id } = req.user;
 
@@ -485,7 +537,6 @@ export const updateDealyShare = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
-
 
 // // ✅ Logout User
 export const logoutUser = async (req, res) => {
