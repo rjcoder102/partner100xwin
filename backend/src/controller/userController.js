@@ -5,6 +5,8 @@ import { createHash, randomInt } from "crypto";
 import jwt from "jsonwebtoken";
 import { pool1, pool2 } from "../../config/db.js";
 import { log } from "console";
+import nodemailer from "nodemailer";
+
 
 const JWT_SECRET = process.env.JWT_SECRET || "suraj1234";
 
@@ -92,7 +94,36 @@ export const loginUser = async (req, res) => {
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        // generate JWT
+        // ✅ Generate OTP (6-digit random)
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        console.log("otpppp", otp);
+
+
+        // ✅ Save OTP in DB
+        await pool1.query("UPDATE users SET otp = ? WHERE id = ?", [otp, user.id]);
+
+        // ✅ Setup nodemailer transporter
+        const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",   // or your mail server
+            port: 587,
+            secure: false,
+            auth: {
+                user: process.env.SMTP_USER, // your email
+                pass: process.env.SMTP_PASS, // your app password
+            },
+        });
+
+        // ✅ Send email with OTP
+        await transporter.sendMail({
+            from: `"Your App" <${process.env.SMTP_USER}>`,
+            to: user.email,
+            subject: "Your Login OTP",
+            text: `Your OTP code is: ${otp}`,
+            html: `<h3>Your OTP Code</h3><p><b>${otp}</b></p>`,
+        });
+
+        // generate JWT (still create token but wait for OTP verify later)
         const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
             expiresIn: "1h",
         });
@@ -106,12 +137,60 @@ export const loginUser = async (req, res) => {
         });
 
         res.json({
-            message: "Login successful",
+            message: "Login successful. OTP sent to your email.",
             user: { id: user.id, email: user.email },
             token, // optional
         });
     } catch (error) {
-        console.error(error);
+        console.error("Login error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+// otp verify
+
+export const verifyOtp = async (req, res) => {
+    const { id, email } = req.user;
+    const { otp } = req.body;
+
+    try {
+        // find user by email
+        const [rows] = await pool1.query("SELECT * FROM users WHERE email = ?", [email]);
+        if (rows.length === 0) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        const user = rows[0];
+
+        // check otp
+        if (user.otp !== otp) {
+            return res.status(400).json({ message: "Invalid OTP" });
+        }
+
+        // ✅ clear OTP after successful verification
+        await pool1.query("UPDATE users SET otp = NULL WHERE id = ?", [user.id]);
+
+        // ✅ generate JWT after successful OTP verification
+        const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
+            expiresIn: "1h",
+        });
+
+        // ✅ set token in cookies
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+
+        res.json({
+            message: "OTP verified successfully. Login complete.",
+            user: { id: user.id, email: user.email },
+            token,
+        });
+
+    } catch (error) {
+        console.error("OTP verification error:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
