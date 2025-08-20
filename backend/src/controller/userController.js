@@ -193,6 +193,7 @@ export const loginUser = async (req, res) => {
             message: "Login successful. OTP sent to your email.",
             user,
             success:true,
+            token
         });
     } catch (error) {
         console.error("Login error:", error);

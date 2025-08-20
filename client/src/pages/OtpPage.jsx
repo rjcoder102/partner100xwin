@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { verifyOtp, resendOtp } from "../Redux/reducer/authSlice"; // ⬅️ import resendOtp
+import { verifyOtp, resendOtp } from "../Redux/reducer/authSlice";
+
 
 const OtpPage = () => {
     const [otp, setOtp] = useState("");
@@ -9,6 +10,7 @@ const OtpPage = () => {
     const location = useLocation();
     const email = location.state?.email;
     const [resendMsg, setResendMsg] = useState("");
+    const [localError, setLocalError] = useState("");
 
 
     const dispatch = useDispatch();
@@ -16,7 +18,7 @@ const OtpPage = () => {
 
     const handleSubmit = (e) => {
         console.log("ewkjhg");
-        
+
         e.preventDefault();
 
         if (!otp || otp.length < 6) {
@@ -24,7 +26,7 @@ const OtpPage = () => {
             return;
         }
 
-        setLocalError(""); // clear local error
+        setLocalError("");
         dispatch(verifyOtp({ otp }))
             .unwrap()
             .then((res) => {
@@ -34,22 +36,22 @@ const OtpPage = () => {
             })
             .catch((err) => {
                 console.log(err.message);
-                
+
             });
     };
 
     // ✅ Proper resendOtp integration
- const handleResend = () => {
-    setResendMsg(""); // clear old message
-    dispatch(resendOtp())
-        .unwrap()
-        .then((res) => {
-            setResendMsg(res.message || "OTP has been resent successfully.");
-        })
-        .catch((err) => {
-            setResendMsg(err || "Failed to resend OTP. Try again.");
-        });
-};
+    const handleResend = () => {
+        setResendMsg("");
+        dispatch(resendOtp())
+            .unwrap()
+            .then((res) => {
+                setResendMsg(res.message || "OTP has been resent successfully.");
+            })
+            .catch((err) => {
+                setResendMsg(err || "Failed to resend OTP. Try again.");
+            });
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#0D0F21] px-4">
@@ -68,6 +70,7 @@ const OtpPage = () => {
                     </p>
                 </div>
 
+                {localError && <p className="text-red-500 mb-2">india </p>}
                 {error && <p className="text-red-500 mb-2">{resendMsg}</p>}
                 {success && <p className="text-green-500 mb-2">{resendMsg}</p>}
 

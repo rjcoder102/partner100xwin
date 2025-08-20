@@ -9,6 +9,7 @@ import LinksPage from "../components/LinksPage";
 import Deposit from "../components/Deposit";
 import Withdrawl from "./Withdrawl";
 import DownlineUser from "../components/DownlineUser";
+import SelfWithdrawl from "./SelfWithdrawl";
 
 const Dashboard = () => {
     const [activePage, setActivePage] = useState("Dashboard");
@@ -20,7 +21,7 @@ const Dashboard = () => {
         { label: "Deposit", icon: <FaChartBar /> },
         { label: "Withdrawl", icon: <FaGift /> },
         { label: "Downline User", icon: <FaBook /> },
-        { label: "Postbook", icon: <FaBook /> },
+        { label: "SelfWithdrawl", icon: <FaBook /> },
         { label: "Contests", icon: <FaTrophy /> },
         { label: "TOP10 Partners", icon: <FaCrown /> },
         { label: "Telegram bot", icon: <FaTelegramPlane /> },
@@ -48,7 +49,11 @@ const Dashboard = () => {
                 );
             case "Downline User":
                 return (
-                   <DownlineUser/>
+                    <DownlineUser />
+                );
+            case "SelfWithdrawl":
+                return (
+                    <SelfWithdrawl />
                 );
             default:
                 return (
