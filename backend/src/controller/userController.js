@@ -52,8 +52,6 @@ export const registerUser = async (req, res) => {
 
         const userId = result.insertId;
 
-        console.log("userId", userId);
-
 
         // Generate JWT
         const token = jwt.sign({ id: userId, email }, process.env.JWT_SECRET, {
@@ -133,10 +131,6 @@ export const resendOtp = async (req, res) => {
 // ✅ Login User
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
-
-    console.log("ewnjknfw", email);
-
-
     try {
         // find user by email
         const [rows] = await pool1.query("SELECT * FROM users WHERE email = ?", [email]);
@@ -156,9 +150,6 @@ export const loginUser = async (req, res) => {
 
         // ✅ Generate OTP (6-digit random)
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-        console.log("otpppp", otp);
-
 
         // ✅ Save OTP in DB
         await pool1.query("UPDATE users SET otp = ? WHERE id = ?", [otp, user.id]);

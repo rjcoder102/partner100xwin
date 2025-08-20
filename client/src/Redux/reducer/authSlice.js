@@ -23,6 +23,7 @@ export const loginUser = createAsyncThunk(
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async ({ email, password }, { rejectWithValue }) => {
+
     try {
       const res = await api.post("/auth/register", { email, password });
       return res.data;
@@ -72,7 +73,7 @@ export const resendOtp = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await api.post("/auth/resend-otp", {}, { withCredentials: true });
-      return res.data; 
+      return res.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to resend OTP"
@@ -170,7 +171,7 @@ const authSlice = createSlice({
       })
       .addCase(resendOtp.fulfilled, (state, action) => {
         state.loading = false;
-        state.success = action.payload.message; 
+        state.success = action.payload.message;
       })
       .addCase(resendOtp.rejected, (state, action) => {
         state.loading = false;

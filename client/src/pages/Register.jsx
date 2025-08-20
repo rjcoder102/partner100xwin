@@ -3,17 +3,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../Redux/reducer/authSlice";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import "react-toastify/dist/ReactToastify.css";
+// import { toast } from "react-toastify";
 
 const Register = () => {
-    const {navigate} = useNavigate()
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
     const [formData, setFormData] = useState({
         email: "",
         password: "",
         terms: false,
     });
 
-   
+
     const { loading, error, user } = useSelector((state) => state.auth);
 
     // Handle input changes
@@ -26,25 +28,31 @@ const Register = () => {
     };
 
     // Handle submit
+
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch(registerUser({ email: formData.email, password: formData.password }));
-    };
 
-    // Show popup & navigate
-    useEffect(() => {
-        if (user) {
-            toast.success("🎉 Successfully registered!", {
-                position: "top-center",
-                autoClose: 2000,
-                theme: "colored",
+        dispatch(registerUser({ email: formData.email, password: formData.password }))
+            .unwrap()
+            .then((data) => {
+                if (data.success) {
+                    toast.success(data.message || "🎉 Successfully registered!", {
+                        position: "top-center",
+                        autoClose: 2000,
+                        theme: "colored",
+                    });
+                    navigate("/dashboard");
+                }
+            })
+            .catch((err) => {
+                toast.error(err || "Registration failed", {
+                    position: "top-center",
+                    autoClose: 3000,
+                    theme: "colored",
+                });
             });
-
-            setTimeout(() => {
-                navigate("/dashboard");
-            }, 2200); // wait for toast before redirect
-        }
-    }, [user, navigate]);
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#0D0F21]">

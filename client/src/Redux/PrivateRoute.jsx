@@ -9,10 +9,10 @@ const PrivateRoute = () => {
     const { user, loading } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        const token = Cookies.get("token"); 
-        if (token && !user && !loading) {
-            dispatch(getUserProfile()); 
-        }
+        const token = Cookies.get("token");
+        // if (token && !user && !loading) {
+        dispatch(getUserProfile());
+        // }
     }, [dispatch, user, loading]);
 
     if (loading) return <p>Loading...</p>;
