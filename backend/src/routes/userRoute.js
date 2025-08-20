@@ -1,5 +1,5 @@
 import express from 'express';
-import { getDipositeData, getDownlineUsers, getUserProfile, getwithdrawlData, loginUser, registerUser, updateDealyShare } from '../controller/userController.js';
+import { getDipositeData, getDownlineUsers, getUserProfile, getwithdrawlData, loginUser, logoutUser, registerUser, updateDealyShare } from '../controller/userController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 
 
