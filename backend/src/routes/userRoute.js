@@ -12,6 +12,6 @@ router.get("/get-downline-user", authMiddleware, getDownlineUsers);
 router.get("/get-downline-deposite", authMiddleware, getDipositeData);
 router.get("/get-downline-withdrowal", authMiddleware, getwithdrawlData);
 router.put("/update-deley-shere", authMiddleware, updateDealyShare);
-// router.post("/logout", logoutUser);
+router.post("/logout", logoutUser);
 
 export default router;

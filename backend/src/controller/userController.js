@@ -118,7 +118,7 @@ export const loginUser = async (req, res) => {
 
 // ✅ Get User Profile
 export const getUserProfile = async (req, res) => {
-    const { id, email } = req.user; 
+    const { id, email } = req.user;
     try {
         // fetch user by ID from decoded token (middleware sets req.user.id)
         const [rows] = await pool1.query(
@@ -359,14 +359,26 @@ export const updateDealyShare = async (req, res) => {
 };
 
 
-
-
-
 // // ✅ Logout User
-// export const logoutUser = (req, res) => {
-//     res.clearCookie("token");
-//     res.json({ message: "Logged out successfully" });
-// };
+export const logoutUser = async (req, res) => {
+    try {
+        // ✅ Clear cookie
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+
+        // (Optional) also clear token from DB if you are storing it
+        // const { id } = req.user;
+        // await pool1.query("UPDATE users SET token = NULL WHERE id = ?", [id]);
+
+        res.json({ message: "Logout successful" });
+    } catch (error) {
+        console.error("Logout error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
 
 
