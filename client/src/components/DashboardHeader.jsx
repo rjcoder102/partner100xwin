@@ -30,9 +30,12 @@ const DashboardHeader = () => {
     const dispatch = useDispatch();
     const { user, loading } = useSelector((state) => state.auth);
 
-    useEffect(() => {
-        dispatch(getUserProfile());
-    }, [dispatch]);
+   useEffect(() => {
+    // const token = Cookies.get("token");
+    if (!user) {
+      dispatch(getUserProfile());
+    }
+  }, [dispatch, user]);
 
     // ✅ Get first letter from email (fallback "U")
     const userInitial =
@@ -243,14 +246,14 @@ const DashboardHeader = () => {
                             {showAccountDropdown && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-20 border border-gray-100 py-1">
                                     <Link
-                                        to="/account"
+                                        to=""
                                         className="block px-4 py-2 text-gray-700 hover:bg-gray-50"
                                         onClick={() => setShowAccountDropdown(false)}
                                     >
                                         My Account
                                     </Link>
                                     <Link
-                                        to="/logout"
+                                        to=""
                                         className="block px-4 py-2 text-gray-700 hover:bg-gray-50"
                                         onClick={() => setShowAccountDropdown(false)}
                                     >
