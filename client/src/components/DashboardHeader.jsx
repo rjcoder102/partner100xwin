@@ -78,7 +78,7 @@ const DashboardHeader = () => {
     return (
         <div className=''>
             {/* Header */}
-            <div className="bg-white shadow-sm px-6 py-2 mb-6">
+            <div className="bg-white shadow-sm px-6 py-2 ">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     {/* Balance Section */}
                     <div className="mb-4 md:mb-0">

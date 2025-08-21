@@ -52,7 +52,7 @@ const Myaccount = () => {
             <div>
                 <DashboardHeader />
             </div>
-            <div className="flex flex-col md:flex-row gap-6 bg-gray-50 p-6 rounded-lg shadow-md">
+            <div className="flex flex-col md:flex-row gap-6 bg-gray-200 p-6 rounded-lg shadow-md">
                 {/* Profile Section */}
                 <div className="bg-white p-6 rounded-lg shadow w-full md:w-2/3">
                     <h2 className="text-xl font-semibold mb-4">Your Profile</h2>

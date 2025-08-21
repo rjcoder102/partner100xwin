@@ -139,7 +139,7 @@ const Withdrawl = () => {
         <div className="min-h-screen bg-gray-50">
             <DashboardHeader />
 
-            <div className="max-w-6xl mx-auto md:p-1 sm:p-6">
+            <div className="max-w-6xl mx-auto md:pt-6 sm:p-6">
                 {/* Summary Cards - Updated to 4 columns */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <div className="bg-white shadow-md rounded-lg p-5 border-l-4 border-blue-500">
