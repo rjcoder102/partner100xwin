@@ -5,10 +5,10 @@ import api from "../api";
 // ✅ Async thunk for fetching downline users
 export const fetchDownlineUsers = createAsyncThunk(
     "downline/fetchDownlineUsers",
-    async ( filter , { rejectWithValue }) => {
+    async (filter, { rejectWithValue }) => {
         try {
             const res = await api.get(
-                `/auth/get-downline-user?filter=${filter || ""}`,{withCredentials:true}
+                `/auth/get-downline-user?filter=${filter || ""}`, { withCredentials: true }
             );
             console.log("📌 Downline API response:", res.data);
             return res.data;
@@ -36,7 +36,9 @@ const downlineSlice = createSlice({
             })
             .addCase(fetchDownlineUsers.fulfilled, (state, action) => {
                 state.loading = false;
-                state.users = Array.isArray(action.payload) ? action.payload : [];
+                state.users = action.payload.data;
+                // console.log("state.users", state.users.data);
+
             })
             .addCase(fetchDownlineUsers.rejected, (state, action) => {
                 state.loading = false;

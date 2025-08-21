@@ -387,7 +387,7 @@ export const getDownlineUsers = async (req, res) => {
 
         const [downlineRows] = await pool2.query(query, values);
 
-        res.json({ userInfo, downlineRows });
+        res.json({ message: "Data fatch", success: true, data: downlineRows });
     } catch (error) {
         console.error("Error fetching downline users:", error);
         res.status(500).json({ message: "Server error" });

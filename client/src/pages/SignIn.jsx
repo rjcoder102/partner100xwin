@@ -25,9 +25,9 @@ const SignIn = () => {
     useEffect(() => {
         if (userInfo) {
             // navigate("/otpcode", { state: { email: user.email } });
-            navigate("/dashboard", { state: { email: user.email } });
+            navigate("/dashboard", { state: { email: userInfo.email } });
         }
-    }, [user, navigate]);
+    }, [userInfo, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#0D0F21]">
@@ -49,7 +49,7 @@ const SignIn = () => {
                 </p>
 
                 {error && <p className="text-red-500 mb-2">{error}</p>}
-                {user && <p className="text-green-500 mb-2">Welcome {user.email}</p>}
+                {userInfo && <p className="text-green-500 mb-2">Welcome {userInfo.email}</p>}
 
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <input
