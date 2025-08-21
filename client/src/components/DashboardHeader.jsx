@@ -82,7 +82,7 @@ const DashboardHeader = () => {
                     {/* Balance Section */}
                     <div className="mb-4 md:mb-0">
                         <div className='flex items-center space-x-3 mb-1'>
-                            <h2 className="text-xl font-bold text-gray-800">{userInfo.balance || 0.00}.00</h2>
+                            <h2 className="text-xl font-bold text-gray-800">{userInfo?.balance || 0.00}.00</h2>
                             <Link
                                 to="/withdraw"
                                 className="bg-emerald-500 hover:bg-emerald-600 p-2 rounded-lg transition-colors duration-200"
@@ -92,7 +92,7 @@ const DashboardHeader = () => {
                             </Link>
                         </div>
                         <p className="text-gray-500 font-semibold text-sm">
-                            Vol: {userInfo.balance || 0.00}.00 / Rev: {userInfo.shere_wallet || 0.00} .00
+                            Vol: {userInfo?.balance || 0.00}.00 / Rev: {userInfo?.shere_wallet || 0.00} .00
                         </p>
                     </div>
 
@@ -151,7 +151,7 @@ const DashboardHeader = () => {
                                 onClick={() => setShowLevelsDropdown(!showLevelsDropdown)}
                                 className="bg-blue-100 text-blue-800 px-3 py-1 rounded-md text-sm font-medium inline-flex items-center justify-center"
                             >
-                                LEVEL {userInfo.leve}
+                                LEVEL {userInfo?.leve}
                                 <FaChevronDown
                                     className={`ml-2 text-xs transition-transform duration-200 ${showLevelsDropdown ? 'rotate-180' : ''
                                         }`}

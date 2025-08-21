@@ -41,14 +41,14 @@ const DashboardPage = () => {
                         <div className="bg-[#1E1E2D] text-white rounded-2xl p-6 flex flex-col justify-between">
                             <div>
                                 <p className="text-gray-300">Your balance</p>
-                                <h2 className="text-4xl font-bold mt-2">{userInfo.balance}</h2>
+                                <h2 className="text-4xl font-bold mt-2">{userInfo?.balance}</h2>
                             </div>
                             <button className="mt-4 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-medium transition">
                                 Go to Withdrawal →
                             </button>
                             <div className="mt-4 bg-[#2A2A3D] p-3 rounded-lg">
                                 <p className="text-gray-400 text-sm">Earnings for all time</p>
-                                <p className="font-bold">{userInfo.shere_wallet}</p>
+                                <p className="font-bold">{userInfo?.shere_wallet}</p>
                             </div>
                         </div>
 
