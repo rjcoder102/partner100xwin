@@ -10,7 +10,7 @@ const SignIn = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { loading, error, user } = useSelector((state) => state.auth);
+    const { loading, error, userInfo } = useSelector((state) => state.auth);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -23,7 +23,7 @@ const SignIn = () => {
 
     // ✅ Redirect after login success
     useEffect(() => {
-        if (user) {
+        if (userInfo) {
             // navigate("/otpcode", { state: { email: user.email } });
             navigate("/dashboard", { state: { email: user.email } });
         }

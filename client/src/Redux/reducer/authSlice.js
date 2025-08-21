@@ -93,12 +93,17 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.post("/auth/logout", {}, { withCredentials: true });
+
+      // ✅ Remove token from localStorage
+      localStorage.removeItem("token");
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Logout failed");
     }
   }
 );
+
 
 const decodeToken = (token) => {
   if (token) {
@@ -137,7 +142,7 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.userInfo = action.payload.user;
         state.token = action.payload.token;
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -184,7 +189,7 @@ const authSlice = createSlice({
       })
       .addCase(verifyOtp.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.userInfo = action.payload.user;
         state.token = action.payload.token;
         state.success = action.payload.message;
       })
@@ -210,7 +215,7 @@ const authSlice = createSlice({
 
       // ✅ Logout API
       .addCase(logoutUser.fulfilled, (state) => {
-        state.user = null;
+        state.userInfo = null;
         state.token = null;
         state.error = null;
         state.success = "Logout successful";

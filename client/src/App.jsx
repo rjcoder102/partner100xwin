@@ -24,11 +24,11 @@ function App() {
         <Route path="/otpcode" element={<OtpPage />} />
 
         {/* Protected routes */}
-        {/* <Route element={<PrivateRoute />}> */}
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/userinformation" element={<UserInformation />} />
-        <Route path="/myaccount" element={<Myaccount />} />
-        {/* </Route> */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/userinformation" element={<UserInformation />} />
+          <Route path="/myaccount" element={<Myaccount />} />
+        </Route>
       </Routes>
     </Router>
   );
