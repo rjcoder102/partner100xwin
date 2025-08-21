@@ -10,6 +10,8 @@ import Deposit from "../components/Deposit";
 import Withdrawl from "./Withdrawl";
 import DownlineUser from "../components/DownlineUser";
 import SelfWithdrawl from "./SelfWithdrawl";
+import UserInformation from "./UserInformation";
+import { IoPersonSharp } from "react-icons/io5";
 
 const Dashboard = () => {
     const [activePage, setActivePage] = useState("Dashboard");
@@ -17,12 +19,12 @@ const Dashboard = () => {
     // Sidebar items with icons
     const menuItems = [
         { label: "Dashboard", icon: <MdWindow /> },
+        { label: "User", icon: <IoPersonSharp /> },
         { label: "Links", icon: <FaLink /> },
         { label: "Deposit", icon: <FaChartBar /> },
         { label: "Withdrawl", icon: <FaGift /> },
         { label: "Downline User", icon: <FaBook /> },
         { label: "SelfWithdrawl", icon: <FaBook /> },
-        { label: "Contests", icon: <FaTrophy /> },
         { label: "TOP10 Partners", icon: <FaCrown /> },
         { label: "Telegram bot", icon: <FaTelegramPlane /> },
         { label: "Support", icon: <FaHeadset /> },
@@ -55,6 +57,12 @@ const Dashboard = () => {
                 return (
                     <SelfWithdrawl />
                 );
+
+            case "User":
+                return (
+                    <UserInformation />
+                );
+
             default:
                 return (
                     <div className="bg-white p-6 rounded-lg shadow">
@@ -66,16 +74,16 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="min-h-screen flex">
+        <div className="min-h-screen flex ">
             {/* Sidebar */}
-            <div className="fixed left-0 top-0 h-full w-72 bg-[#1b1b28] shadow-md">
+            <div className="fixed left-0 top-0 h-full w-72 bg-[#1b1b28] shadow-md sm:hidden md:block">
                 <div className="py-3.5 bg-[#0D0F21] flex items-center justify-center ">
                     <img
                         className="h-10"
                         src="https://quotex-partner.com/affiliate_site/images/landing/header-logo.svg"
                         alt="logo"
                     />
-                </div>
+                </div>  
 
                 <nav className="pt-7">
                     <ul className="space-y-2">

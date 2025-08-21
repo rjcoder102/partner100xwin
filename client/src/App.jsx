@@ -7,6 +7,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./Redux/PrivateRoute";
 import OtpPage from "./pages/OtpPage";
+import UserInformation from "./pages/UserInformation";
+import Myaccount from "./pages/Myaccount";
 
 
 
@@ -22,9 +24,11 @@ function App() {
         <Route path="/otpcode" element={<OtpPage />} />
 
         {/* Protected routes */}
-        <Route element={<PrivateRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Route>
+        {/* <Route element={<PrivateRoute />}> */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/userinformation" element={<UserInformation />} />
+        <Route path="/myaccount" element={<Myaccount />} />
+        {/* </Route> */}
       </Routes>
     </Router>
   );

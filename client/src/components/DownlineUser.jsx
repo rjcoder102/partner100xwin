@@ -128,7 +128,11 @@ const DownlineUser = () => {
                                             )}
                                         </td>
                                         <td className="p-2 flex gap-2">
-                                            <button className="bg-green-500 text-white px-2 py-1 rounded text-xs">
+                                            {/* ✅ Navigate with ID or index */}
+                                            <button
+                                                onClick={() => navigate(`/userinformation/${user.id}`)}
+                                                className="bg-green-500 text-white px-2 py-1 rounded text-xs"
+                                            >
                                                 D
                                             </button>
                                             <button className="bg-orange-500 text-white px-2 py-1 rounded text-xs">
