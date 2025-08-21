@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaArrowRight, FaChevronDown } from 'react-icons/fa';
 import { FiChevronDown, FiGlobe } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../Redux/reducer/authSlice";
 // import { getUserProfile, logoutUser } from "../Redux/reducer/authSlice";
@@ -67,6 +67,12 @@ const DashboardHeader = () => {
         setShowAccountDropdown(false);
         navigate("/login"); // Redirect to login page
     };
+
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const redirect = queryParams.get("redirect");
+
+    console.log("Redirect:", redirect);
 
     return (
         <div className=''>
@@ -257,7 +263,7 @@ const DashboardHeader = () => {
                             {showAccountDropdown && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-20 border border-gray-100 py-1">
                                     <Link
-                                        to=""
+                                        to="/myaccount?redirect=true"
                                         className="block px-4 py-2 text-gray-700 hover:bg-gray-50"
                                         onClick={() => setShowAccountDropdown(false)}
                                     >
