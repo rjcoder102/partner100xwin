@@ -3,7 +3,7 @@ import { FaArrowRight, FaChevronDown } from 'react-icons/fa';
 import { FiChevronDown, FiGlobe } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
-import { getUserProfile } from "../Redux/reducer/authSlice";
+import { getUserProfile, logoutUser } from "../Redux/reducer/authSlice";
 
 
 const languages = [
@@ -30,12 +30,12 @@ const DashboardHeader = () => {
     const dispatch = useDispatch();
     const { user, loading } = useSelector((state) => state.auth);
 
-   useEffect(() => {
-    // const token = Cookies.get("token");
-    if (!user) {
-      dispatch(getUserProfile());
-    }
-  }, [dispatch, user]);
+    useEffect(() => {
+        // const token = Cookies.get("token");
+        if (!user) {
+            dispatch(getUserProfile());
+        }
+    }, [dispatch, user]);
 
     // ✅ Get first letter from email (fallback "U")
     const userInitial =
@@ -55,6 +55,13 @@ const DashboardHeader = () => {
             "****@" +
             domain
         );
+    };
+
+    // ✅ Logout Handler
+    const handleLogout = async () => {
+        await dispatch(logoutUser());
+        setShowAccountDropdown(false);
+        navigate("/login"); // Redirect to login page
     };
 
     return (
@@ -255,7 +262,7 @@ const DashboardHeader = () => {
                                     <Link
                                         to=""
                                         className="block px-4 py-2 text-gray-700 hover:bg-gray-50"
-                                        onClick={() => setShowAccountDropdown(false)}
+                                        onClick={handleLogout}
                                     >
                                         Sign Out
                                     </Link>

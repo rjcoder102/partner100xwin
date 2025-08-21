@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, Navigate } from "react-router-dom";
-import { getUserProfile } from "../Redux/reducer/authSlice";
+// import { getUserProfile } from "../Redux/reducer/authSlice";
 import Cookies from "js-cookie";
 
 const PrivateRoute = () => {
@@ -11,7 +11,7 @@ const PrivateRoute = () => {
     useEffect(() => {
         const token = Cookies.get("token");
         // if (token && !user && !loading) {
-        dispatch(getUserProfile());
+        dispatch
         // }
     }, [dispatch, user, loading]);
 
