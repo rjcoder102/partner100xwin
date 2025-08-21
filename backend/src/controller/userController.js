@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 import { createHash, randomInt } from "crypto";
 import jwt from "jsonwebtoken";
 import { pool1, pool2 } from "../../config/db.js";
-import { log } from "console";
 import nodemailer from "nodemailer";
 import axios from "axios"
 
@@ -571,8 +570,7 @@ export const gameHistory = async (req, res) => {
     }
 };
 
-
-// // ✅ Logout User
+// ✅ Logout User
 export const logoutUser = async (req, res) => {
     try {
         // ✅ Clear cookie
@@ -592,8 +590,6 @@ export const logoutUser = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
-
-
 
 
 
