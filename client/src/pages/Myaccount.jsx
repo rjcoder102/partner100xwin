@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import DashboardHeader from '../components/DashboardHeader';
 
 const Myaccount = () => {
@@ -42,6 +42,11 @@ const Myaccount = () => {
         alert("Password changed successfully!");
     };
 
+    const inputClass = `w-full p-3 rounded-lg bg-gray-100 text-gray-800
+                       focus:outline-none 
+                        focus:ring-[0.5px] focus:ring-[#e5ea55] focus:border-[#e5ea55]
+                        transition-all duration-200`;
+
     return (
         <>
             <div>
@@ -60,7 +65,7 @@ const Myaccount = () => {
                                 placeholder="Enter your First name"
                                 value={user.firstName}
                                 onChange={handleProfileChange}
-                                className="w-full p-3 text-[#] focus:border-[#e5ea55] outline-none rounded-lg bg-gray-100"
+                                className={inputClass}
                             />
                         </div>
                         <div>
@@ -71,7 +76,7 @@ const Myaccount = () => {
                                 placeholder="Enter your Nickname"
                                 value={user.nickname}
                                 onChange={handleProfileChange}
-                                className="w-full p-3  rounded-lg bg-gray-100"
+                                className={inputClass}
                             />
                         </div>
                     </div>
@@ -84,7 +89,7 @@ const Myaccount = () => {
                                 name="email"
                                 value={user.email}
                                 disabled
-                                className="w-full p-3  rounded-lg bg-gray-100"
+                                className={`${inputClass} cursor-not-allowed bg-gray-200`}
                             />
                         </div>
                         <div>
@@ -95,7 +100,7 @@ const Myaccount = () => {
                                 placeholder="Enter your Telegram username"
                                 value={user.telegramId}
                                 onChange={handleProfileChange}
-                                className="w-full p-3  rounded-lg bg-gray-100"
+                                className={inputClass}
                             />
                         </div>
                         <div>
@@ -104,7 +109,7 @@ const Myaccount = () => {
                                 name="country"
                                 value={user.country}
                                 onChange={handleProfileChange}
-                                className="w-full p-3  rounded-lg bg-gray-100"
+                                className={inputClass}
                             >
                                 <option value="India">India</option>
                                 <option value="USA">USA</option>
@@ -120,15 +125,15 @@ const Myaccount = () => {
                             placeholder="Provide links to your projects, groups, channels, websites, social networks through which you refer clients to us."
                             value={user.trafficSources}
                             onChange={handleProfileChange}
-                            className="w-full p-3  rounded-lg bg-gray-100"
+                            className={inputClass}
                         ></textarea>
                     </div>
 
                     <div className="mt-6 flex justify-between items-center">
-                        <button className="text-red-500 text-sm">✖ Delete account</button>
+                        <button className="text-red-500 text-sm hover:underline">✖ Delete account</button>
                         <button
                             onClick={handleProfileSave}
-                            className="bg-blue-500 text-white px-6 py-2 rounded-lg"
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition"
                         >
                             Save
                         </button>
@@ -152,51 +157,50 @@ const Myaccount = () => {
 
                     <div className="space-y-3">
                         <div>
-                            <label htmlFor="" className='text-[#b5b5c3]'>OldPassword</label>
+                            <label className="text-[#b5b5c3]">Old Password</label>
                             <input
                                 type="password"
                                 name="oldPassword"
                                 placeholder="Please enter your Old Password"
                                 value={security.oldPassword}
                                 onChange={handleSecurityChange}
-                                className="w-full p-3  rounded-lg bg-gray-100"
+                                className={inputClass}
                             />
                         </div>
                         <div>
-                            <label htmlFor="" className='text-[#b5b5c3]'>NewPassword</label>
+                            <label className="text-[#b5b5c3]">New Password</label>
                             <input
                                 type="password"
                                 name="newPassword"
                                 placeholder="Please enter your New Password"
                                 value={security.newPassword}
                                 onChange={handleSecurityChange}
-                                className="w-full p-3  rounded-lg bg-gray-100"
+                                className={inputClass}
                             />
                         </div>
                         <div>
-                            <label htmlFor="" className='text-[#b5b5c3]'>ConfirmPassword</label>
+                            <label className="text-[#b5b5c3]">Confirm Password</label>
                             <input
                                 type="password"
                                 name="confirmPassword"
                                 placeholder="Please confirm your New Password"
                                 value={security.confirmPassword}
                                 onChange={handleSecurityChange}
-                                className="w-full p-3  rounded-lg bg-gray-100"
+                                className={inputClass}
                             />
                         </div>
                     </div>
 
                     <button
                         onClick={handleChangePassword}
-                        className="bg-blue-500 text-white w-full mt-4 py-2 rounded-lg"
+                        className="bg-blue-500 hover:bg-blue-600 text-white w-full mt-4 py-2 rounded-lg transition"
                     >
                         Change Password
                     </button>
                 </div>
             </div>
         </>
-
     );
-}
+};
 
-export default Myaccount
+export default Myaccount;
