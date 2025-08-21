@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FaArrowRight, FaChevronDown } from 'react-icons/fa';
 import { FiChevronDown, FiGlobe } from 'react-icons/fi';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "../Redux/reducer/authSlice";
+import { getUser, logoutUser } from "../Redux/reducer/authSlice";
 // import { getUserProfile, logoutUser } from "../Redux/reducer/authSlice";
 
 
@@ -29,6 +29,7 @@ const DashboardHeader = () => {
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate()
     const { userInfo, loading } = useSelector((state) => state.auth);
 
     // console.log("userInfo", userInfo);
@@ -65,7 +66,7 @@ const DashboardHeader = () => {
     const handleLogout = async () => {
         await dispatch(logoutUser());
         setShowAccountDropdown(false);
-        navigate("/login"); // Redirect to login page
+        navigate("/signin"); // Redirect to login page
     };
 
     const location = useLocation();
