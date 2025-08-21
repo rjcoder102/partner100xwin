@@ -20,7 +20,7 @@ const UserInformation = () => {
             <DashboardHeader />
 
             {/* Main Content */}
-            <div className="container mx-auto max-w-6xl">
+            <div className="container mx-auto max-w-6xl pt-6">
                 {/* Tabs */}
                 <div className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
                     <div className="flex border-b">

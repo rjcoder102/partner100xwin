@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaArrowRight, FaChevronDown } from 'react-icons/fa';
-import { FiChevronDown, FiGlobe } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FaRegBookmark } from "react-icons/fa";
 import { FiLink } from "react-icons/fi";
 import { BiMessageDetail } from "react-icons/bi";
@@ -27,13 +25,21 @@ const DashboardPage = () => {
         }
     }, [dispatch]);
 
+    // params path
+
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const redirect = queryParams.get("redirect");
+
+    console.log("Redirect:", redirect);
+
     return (
         <div className='min-h-screen '>
             <div>
                 <DashboardHeader />
             </div>
             {/* main content */}
-            <div className="">
+            <div className="pt-6">
                 <div className="max-w-6xl mx-auto space-y-6">
                     {/* Top Section */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -43,9 +49,9 @@ const DashboardPage = () => {
                                 <p className="text-gray-300">Your balance</p>
                                 <h2 className="text-4xl font-bold mt-2">{userInfo?.balance}</h2>
                             </div>
-                            <button className="mt-4 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-medium transition">
+                            <Link to="/selfwithdrawl?redirect=true" className="mt-4 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-medium transition">
                                 Go to Withdrawal →
-                            </button>
+                            </Link>
                             <div className="mt-4 bg-[#2A2A3D] p-3 rounded-lg">
                                 <p className="text-gray-400 text-sm">Earnings for all time</p>
                                 <p className="font-bold">{userInfo?.shere_wallet}</p>

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { FaCheck, FaTrash } from "react-icons/fa";
 import DashboardHeader from "./DashboardHeader";
 import { fetchDownlineUsers } from "../Redux/reducer/downlineSlicer";
+import { Link, useLocation } from "react-router-dom";
 
 const DownlineUser = () => {
     const [activeTab, setActiveTab] = useState("active");
@@ -28,6 +29,12 @@ const DownlineUser = () => {
             u.username?.toLowerCase().includes(search.toLowerCase()) &&
             (activeTab === "active" ? u.status === 1 : u.status !== 1)
     );
+
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const redirect = queryParams.get("redirect");
+
+    console.log("Redirect:", redirect);
 
     return (
         <>
@@ -134,9 +141,9 @@ const DownlineUser = () => {
                                         </td>
                                         <td className="p-2 flex gap-2">
 
-                                            <button className="bg-blue-500 text-white px-2 py-1 rounded text-xs">
-                                                More
-                                            </button>
+                                            <Link  to="/userInformation?redirect=true" className="bg-blue-500 text-white px-2 py-1 rounded text-xs">
+                                                Profile
+                                            </Link>
                                             {/* <button className="bg-red-500 text-white px-2 py-1 rounded text-xs">
                                                 <FaTrash />
                                             </button> */}

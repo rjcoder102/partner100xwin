@@ -9,6 +9,7 @@ import PrivateRoute from "./Redux/PrivateRoute";
 import OtpPage from "./pages/OtpPage";
 import UserInformation from "./pages/UserInformation";
 import Myaccount from "./pages/Myaccount";
+import SelfWithdrawl from "./pages/SelfWithdrawl";
 
 
 
@@ -28,6 +29,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/userinformation" element={<UserInformation />} />
           <Route path="/myaccount" element={<Myaccount />} />
+          <Route path="/selfwithdrawl" element={<SelfWithdrawl />} />
+          <Route path="/userInformation" element={<UserInformation/>} />
         </Route>
       </Routes>
     </Router>

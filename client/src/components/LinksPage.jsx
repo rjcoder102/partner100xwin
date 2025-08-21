@@ -82,7 +82,7 @@ const LinksPage = () => {
     <div className=" min-h-screen">
       <DashboardHeader />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 ">
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {/* Header Section */}
           <div className="px-6 py-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between">
