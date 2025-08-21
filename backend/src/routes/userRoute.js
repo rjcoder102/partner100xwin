@@ -3,6 +3,7 @@ import {
     gameHistory,
     getDipositeData,
     getDownlineUsers,
+    getSingleUserDetails,
     getUserProfile,
     getwithdrawlData,
     loginUser,
@@ -36,5 +37,7 @@ router.post("/user-withdrowal", authMiddleware, createWithdrawalRequest);
 router.get("/get-bet-history", gameHistory);
 // router.post("/update-leve", updateAllUserLevels);
 router.post("/logout", logoutUser);
+
+router.get("/get-single-user/detale/:id", getSingleUserDetails)
 
 export default router;

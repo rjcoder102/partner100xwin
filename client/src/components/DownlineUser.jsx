@@ -78,6 +78,7 @@ const DownlineUser = () => {
                             <thead>
                                 <tr className="bg-gray-100 text-gray-700 text-left">
                                     <th className="p-2">Sr. No</th>
+                                    <th className="p-2">User Id</th>
                                     <th className="p-2">Username</th>
                                     <th className="p-2">Name</th>
                                     <th className="p-2">Role</th>
@@ -103,6 +104,7 @@ const DownlineUser = () => {
                                         className="border-t border-gray-200 hover:bg-gray-50 transition"
                                     >
                                         <td className="p-2">{i + 1}</td>
+                                        <td className="p-2">{user.id}</td>
                                         <td className="p-2">{user.username}</td>
                                         <td className="p-2">{user.name}</td>
                                         <td className="p-2">{user.role}</td>
