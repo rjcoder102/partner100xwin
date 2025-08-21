@@ -1,6 +1,6 @@
 // src/Redux/reducer/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../api";
+import api from "../api"; // ✅ Axios instance with baseURL
 import Cookies from "js-cookie";
 
 // ✅ Async thunk for login
@@ -23,7 +23,6 @@ export const loginUser = createAsyncThunk(
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async ({ email, password }, { rejectWithValue }) => {
-
     try {
       const res = await api.post("/auth/register", { email, password });
       return res.data;
@@ -53,11 +52,7 @@ export const verifyOtp = createAsyncThunk(
   "auth/verifyOtp",
   async ({ otp }, { rejectWithValue }) => {
     try {
-      const res = await api.post(
-        "/auth/otp-verify",
-        { otp },
-        { withCredentials: true }
-      );
+      const res = await api.post("/auth/otp-verify", { otp }, { withCredentials: true });
       return res.data;
     } catch (error) {
       return rejectWithValue(
@@ -78,6 +73,19 @@ export const resendOtp = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message || "Failed to resend OTP"
       );
+    }
+  }
+);
+
+// ✅ Logout API Call (Fixed: using api instead of axios)
+export const logoutUser = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/auth/logout", {}, { withCredentials: true });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Logout failed");
     }
   }
 );
@@ -175,6 +183,17 @@ const authSlice = createSlice({
       })
       .addCase(resendOtp.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload;
+      })
+
+      // ✅ Logout API
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.token = null;
+        state.error = null;
+        state.success = "Logout successful";
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
         state.error = action.payload;
       });
   },
