@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api"; // ✅ Axios instance with baseURL
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 // ✅ Async thunk for login
 export const loginUser = createAsyncThunk(
@@ -11,6 +12,9 @@ export const loginUser = createAsyncThunk(
       const res = await api.post("/auth/login", { email, password });
       if (res.data.token) {
         Cookies.set("token", res.data.token, { expires: 7 });
+      }
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
       }
       return res.data; // { user, token }
     } catch (err) {
@@ -25,6 +29,9 @@ export const registerUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const res = await api.post("/auth/register", { email, password });
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Register failed");
@@ -32,16 +39,19 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// ✅ Async thunk for fetching user profile
-export const getUserProfile = createAsyncThunk(
-  "auth/getUserProfile",
+
+export const getUser = createAsyncThunk(
+  "user/get-user",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await api.get("/auth/get-user", { withCredentials: true });
-      return res.data; // should return { user: {...} }
-    } catch (err) {
+      const response = await api.get("/auth/get-user", {
+        withCredentials: true,
+      });
+      const data = response.data;
+      return data;
+    } catch (error) {
       return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch user profile"
+        error.response?.data || { message: "Something went wrong" }
       );
     }
   }
@@ -90,9 +100,19 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
+const decodeToken = (token) => {
+  if (token) {
+    const userInfo = jwtDecode(token);
+    return userInfo;
+  } else {
+    return "";
+  }
+};
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
+    userInfo: null,
     user: null,
     token: null,
     loading: false,
@@ -100,12 +120,12 @@ const authSlice = createSlice({
     success: null,
   },
   reducers: {
-    logout: (state) => {
-      state.user = null;
-      state.token = null;
-      state.error = null;
-      state.success = null;
-      Cookies.remove("token");
+    messageClear: (state, _) => {
+      state.errorMessage = "";
+      state.successMessage = "";
+    },
+    user_reset: (state, _) => {
+      state.userInfo = "";
     },
   },
   extraReducers: (builder) => {
@@ -132,7 +152,7 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.userInfo = action.payload.user;
         state.token = action.payload.token;
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -140,20 +160,22 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ✅ Get User Profile
-      .addCase(getUserProfile.pending, (state) => {
+
+      // Get user by ID
+      .addCase(getUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getUserProfile.fulfilled, (state, action) => {
+      .addCase(getUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user || action.payload;
+        state.userInfo = action.payload.data;
+        console.log("state.userInfo", state.userInfo);
+
       })
-      .addCase(getUserProfile.rejected, (state, action) => {
+      .addCase(getUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-
       // ✅ Verify OTP
       .addCase(verifyOtp.pending, (state) => {
         state.loading = true;

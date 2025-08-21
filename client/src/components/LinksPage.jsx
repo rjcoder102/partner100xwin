@@ -1,12 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaPlus, FaSearch, FaCopy, FaEdit, FaTrash, FaShareAlt } from 'react-icons/fa';
 import DashboardHeader from './DashboardHeader';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUser } from '../Redux/reducer/authSlice';
 
 const LinksPage = () => {
+
+
+  const dispatch = useDispatch()
+
+  const { userInfo, loading } = useSelector((state) => state.auth);
+
+  console.log("from link page", userInfo);
+
+
+  useEffect(() => {
+    // const token = Cookies.get("token");
+    if (!userInfo) {
+      dispatch(getUser());
+    }
+  }, [dispatch]);
+
   const [links, setLinks] = useState([
     {
       id: 1529756,
-      url: 'broker-qx.pro/sign-up/?lid=1529756',
+      url: `https://100xwins.com/register?refercode=${userInfo.code}`,
       comment: '',
       type: 'Register link',
       program: 'Turnover Sharing',
@@ -97,7 +115,8 @@ const LinksPage = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{link.id}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
                       <div className="flex items-center">
-                        <span className="truncate max-w-xs">{link.url}</span>
+                        <a target='_blank' href={link.url}>{link.url}</a>
+                        {/* <span className="truncate max-w-xs">{link.url}</span> */}
                         <button
                           onClick={() => copyToClipboard(link.url)}
                           className="ml-2 text-gray-400 hover:text-blue-600 transition-colors"
@@ -128,7 +147,7 @@ const LinksPage = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{link.date}</td>
-                    
+
 
                   </tr>
                 ))}
@@ -138,7 +157,7 @@ const LinksPage = () => {
         </div>
         <div className="flex items-center justify-center my-10 space-x-3">
           <button
-            onClick={() => handleShareLink(links[0]?.url)} 
+            onClick={() => handleShareLink(links[0]?.url)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-md flex items-center transition-colors duration-200"
           >
             <FaShareAlt className="mr-2" />

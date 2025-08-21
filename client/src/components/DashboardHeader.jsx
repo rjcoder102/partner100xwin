@@ -3,7 +3,8 @@ import { FaArrowRight, FaChevronDown } from 'react-icons/fa';
 import { FiChevronDown, FiGlobe } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
-import { getUserProfile, logoutUser } from "../Redux/reducer/authSlice";
+import { getUser } from "../Redux/reducer/authSlice";
+// import { getUserProfile, logoutUser } from "../Redux/reducer/authSlice";
 
 
 const languages = [
@@ -28,19 +29,22 @@ const DashboardHeader = () => {
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
 
     const dispatch = useDispatch();
-    const { user, loading } = useSelector((state) => state.auth);
+    const { userInfo, loading } = useSelector((state) => state.auth);
+
+    // console.log("userInfo", userInfo);
+
 
     useEffect(() => {
         // const token = Cookies.get("token");
-        if (!user) {
-            dispatch(getUserProfile());
+        if (!userInfo) {
+            dispatch(getUser());
         }
-    }, [dispatch, user]);
+    }, [dispatch]);
 
     // ✅ Get first letter from email (fallback "U")
     const userInitial =
-        user?.name?.charAt(0).toUpperCase() ||
-        user?.email?.charAt(0).toUpperCase() ||
+        userInfo?.name?.charAt(0).toUpperCase() ||
+        userInfo?.email?.charAt(0).toUpperCase() ||
         "U";
 
     // ✅ Masked email (dashboard****@gmail.com style)
@@ -72,7 +76,7 @@ const DashboardHeader = () => {
                     {/* Balance Section */}
                     <div className="mb-4 md:mb-0">
                         <div className='flex items-center space-x-3 mb-1'>
-                            <h2 className="text-xl font-bold text-gray-800">$0.00</h2>
+                            <h2 className="text-xl font-bold text-gray-800">{userInfo.balance || 0.00}.00</h2>
                             <Link
                                 to="/withdraw"
                                 className="bg-emerald-500 hover:bg-emerald-600 p-2 rounded-lg transition-colors duration-200"
@@ -82,7 +86,7 @@ const DashboardHeader = () => {
                             </Link>
                         </div>
                         <p className="text-gray-500 font-semibold text-sm">
-                            Vol: $0.00 / Rev: $0.00
+                            Vol: {userInfo.balance || 0.00}.00 / Rev: {userInfo.shere_wallet || 0.00} .00
                         </p>
                     </div>
 
@@ -108,7 +112,7 @@ const DashboardHeader = () => {
                                     />
                                 </svg>
                             </div>
-                            <span>@quotex_partner</span>
+                            <span>@100xwins_partner</span>
                         </a>
                         {/* Language Dropdown */}
                         <div className="relative">
@@ -141,7 +145,7 @@ const DashboardHeader = () => {
                                 onClick={() => setShowLevelsDropdown(!showLevelsDropdown)}
                                 className="bg-blue-100 text-blue-800 px-3 py-1 rounded-md text-sm font-medium inline-flex items-center justify-center"
                             >
-                                LEVEL 1
+                                LEVEL {userInfo.leve}
                                 <FaChevronDown
                                     className={`ml-2 text-xs transition-transform duration-200 ${showLevelsDropdown ? 'rotate-180' : ''
                                         }`}
@@ -241,7 +245,7 @@ const DashboardHeader = () => {
                                     {loading ? "…" : userInitial}
                                 </div>
                                 <span className="ml-2 mr-1 text-sm hidden sm:inline">
-                                    {loading ? "Loading..." : maskEmail(user?.email)}
+                                    {loading ? "Loading..." : maskEmail(userInfo?.email)}
                                 </span>
                                 <FaChevronDown
                                     className={`ml-1 text-xs transition-transform duration-200 ${showAccountDropdown ? "rotate-180" : ""

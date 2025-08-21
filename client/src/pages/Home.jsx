@@ -98,9 +98,34 @@ const Home = () => {
     };
 
     // Submit handler
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
+    //     dispatch(registerUser({ email: formData.email, password: formData.password }));
+    // };
+
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch(registerUser({ email: formData.email, password: formData.password }));
+
+        dispatch(registerUser({ email: formData.email, password: formData.password }))
+            .unwrap()
+            .then((data) => {
+                if (data.success) {
+                    toast.success(data.message || "🎉 Successfully registered!", {
+                        position: "top-center",
+                        autoClose: 2000,
+                        theme: "colored",
+                    });
+                    navigate("/dashboard");
+                }
+            })
+            .catch((err) => {
+                toast.error(err || "Registration failed", {
+                    position: "top-center",
+                    autoClose: 3000,
+                    theme: "colored",
+                });
+            });
     };
 
     // Show popup & navigate

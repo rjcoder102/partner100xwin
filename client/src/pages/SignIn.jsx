@@ -24,7 +24,8 @@ const SignIn = () => {
     // ✅ Redirect after login success
     useEffect(() => {
         if (user) {
-            navigate("/otpcode", { state: { email: user.email } });
+            // navigate("/otpcode", { state: { email: user.email } });
+            navigate("/dashboard", { state: { email: user.email } });
         }
     }, [user, navigate]);
 

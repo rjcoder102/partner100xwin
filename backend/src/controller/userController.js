@@ -255,10 +255,7 @@ export const getUserProfile = async (req, res) => {
             "SELECT * FROM users WHERE id = ?",
             [id]
         );
-        // const [user] = await pool2.query(
-        //     "SELECT * FROM 	users WHERE email = ?",
-        //     [email]
-        // );
+
 
         const user = rows[0]
 
@@ -268,9 +265,9 @@ export const getUserProfile = async (req, res) => {
         }
 
         // ✅ user found
-        res.json({
+        res.status(200).json({
             message: "Fatch User Details successfully",
-            user,
+            data: user,
             success: true
         });
     } catch (error) {
@@ -278,6 +275,86 @@ export const getUserProfile = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
+export const updateUser = async (req, res) => {
+    const { id, email } = req.user
+    try {
+        // const { id } = req.params; // user ID from URL
+        const { fname, lname, telegramId, country, traffic_source } = req.body;
+
+
+
+        // Run update query
+        const [result] = await pool1.query(
+            `UPDATE users SET fname = ?, lname = ?, telegramId = ?, country = ?,  traffic_source = ? WHERE id = ?`, [
+            fname, lname, telegramId, country, traffic_source, id,
+        ]);
+
+        const [rows] = await pool1.query(
+            "SELECT * FROM users WHERE id = ?",
+            [id]
+        );
+
+
+        const user = rows[0]
+
+
+        return res.json({
+            message: "User updated successfully",
+            data: user,
+            success: true,
+        });
+    } catch (error) {
+        console.error("Update user error:", error);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+
+
+export const updatePassword = async (req, res) => {
+    const { id } = req.user; // ✅ from JWT middleware
+    const { oldPassword, newPassword } = req.body;
+
+    try {
+        // Validate input
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({ message: "Old and new password are required" });
+        }
+
+        // Fetch current user
+        const [rows] = await pool1.query("SELECT * FROM users WHERE id = ?", [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const user = rows[0];
+
+        // Hash old password and compare
+        const oldHashed = createHash("md5").update(oldPassword).digest("hex");
+        if (user.password !== oldHashed) {
+            return res.status(400).json({ message: "Old password is incorrect" });
+        }
+
+        // Hash new password
+        const newHashed = createHash("md5").update(newPassword).digest("hex");
+
+        // Update password
+        await pool1.query("UPDATE users SET password = ? WHERE id = ?", [newHashed, id]);
+
+        return res.status(200).json({
+            message: "Password updated successfully",
+            success: true,
+        });
+    } catch (error) {
+        console.error("Update password error:", error);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
+
 
 export const getDownlineUsers = async (req, res) => {
     const { id } = req.user;
