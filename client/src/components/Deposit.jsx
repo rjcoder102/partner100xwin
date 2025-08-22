@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import DashboardHeader from './DashboardHeader';
 import { FiCopy, FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDownlineDeposte } from '../Redux/reducer/downlineSlicer';
 
 const Deposit = () => {
     // Enhanced sample data with more realistic entries
@@ -133,6 +135,24 @@ const Deposit = () => {
         }
     ];
 
+    const [filter, setFilter] = useState("month"); // day, week, month
+    const [dateFilter, setDateFilter] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+    const [search, setSearch] = useState("");
+
+    const dispatch = useDispatch();
+
+    // Redux store se users + loading + error
+    const { depositeData, loading, error } = useSelector((state) => state.downline);
+
+    console.log("depositeData", depositeData?.depositRows?.length);
+
+    // ✅ API call
+    useEffect(() => {
+        dispatch(fetchDownlineDeposte(filter));
+    }, [dispatch, filter]);
+
     const statusStyles = {
         Completed: { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
         Pending: { bg: "bg-yellow-100", text: "text-yellow-800", dot: "bg-yellow-500" },
@@ -151,14 +171,11 @@ const Deposit = () => {
         }
     }
 
-    const [filter, setFilter] = useState("month"); // day, week, month
-    const [dateFilter, setDateFilter] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+
 
     // Filtering Logic
     const filteredDeposits = useMemo(() => {
-        let data = [...initialDeposits];
+        let data = [...depositeData?.depositRows];
         const today = new Date();
 
         if (filter === "day") {
@@ -217,250 +234,237 @@ const Deposit = () => {
         <div className="min-h-screen bg-gray-100">
             <DashboardHeader />
 
-            <div className="max-w-6xl mx-auto md:pt-6 sm:p-6">
-                {/* Summary Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-white shadow rounded-xl p-4 border-l-4 border-blue-500">
-                        <p className="text-gray-500 text-sm font-medium">Total Deposits</p>
-                        <p className="text-2xl font-bold text-gray-800">
-                            {summary.totalDeposits}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">All payment methods</p>
-                    </div>
-                    <div className="bg-white shadow rounded-xl p-4 border-l-4 border-green-500">
-                        <p className="text-gray-500 text-sm font-medium">Total Amount</p>
-                        <p className="text-2xl font-bold text-gray-800">
-                            {currency(summary.totalAmount)}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">Current period</p>
-                    </div>
-                    <div className="bg-white shadow rounded-xl p-4 border-l-4 border-purple-500">
-                        <p className="text-gray-500 text-sm font-medium">
-                            Successful Deposits
-                        </p>
-                        <p className="text-2xl font-bold text-gray-800">
-                            {summary.successful}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                            {filteredDeposits.length > 0
-                                ? `${Math.round(
-                                    (summary.successful / filteredDeposits.length) * 100
-                                )}% success rate`
-                                : "No data"}
-                        </p>
-                    </div>
-                    <div className="bg-white shadow rounded-xl p-4 border-l-4 border-orange-500">
-                        <p className="text-gray-500 text-sm font-medium">
-                            Unique Users
-                        </p>
-                        <p className="text-2xl font-bold text-gray-800">
-                            {summary.uniqueUsers}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                            {filteredDeposits.length > 0
-                                ? `Avg ${(filteredDeposits.length / summary.uniqueUsers).toFixed(1)} deposits per user`
-                                : "No data"}
-                        </p>
-                    </div>
-                </div>
+            {loading ? (
+                <div>Loading.....</div>
+            ) : (
+                <div className="max-w-6xl mx-auto md:pt-6 sm:p-6">
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <div className="bg-white shadow rounded-xl p-4 border-l-4 border-blue-500">
+                            <p className="text-gray-500 text-sm font-medium">Total Deposits</p>
+                            <p className="text-2xl font-bold text-gray-800">
+                                {depositeData?.depositRows?.length}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">All payment methods</p>
+                        </div>
+                        <div className="bg-white shadow rounded-xl p-4 border-l-4 border-green-500">
+                            <p className="text-gray-500 text-sm font-medium">Total Amount</p>
+                            <p className="text-2xl font-bold text-gray-800">
+                                {depositeData?.totalAmount}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">Current period</p>
+                        </div>
+                        <div className="bg-white shadow rounded-xl p-4 border-l-4 border-purple-500">
+                            <p className="text-gray-500 text-sm font-medium">
+                                Successful Deposits
+                            </p>
+                            <p className="text-2xl font-bold text-gray-800">
+                                {depositeData?.depositRows?.length}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1"> Successful Deposits</p>
+                        </div>
 
-                {/* Filters */}
-                <div className="bg-white shadow-md rounded-xl p-4 mb-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        {/* Time Period Buttons */}
-                        <div className="flex flex-wrap gap-2">
-                            {["day", "week", "month"].map((type) => (
-                                <button
-                                    key={type}
-                                    onClick={() => {
-                                        setFilter(type);
-                                        setCurrentPage(1);
-                                    }}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === type
+                    </div>
+
+                    {/* Filters */}
+                    <div className="bg-white shadow-md rounded-xl p-4 mb-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            {/* Time Period Buttons */}
+                            <div className="flex flex-wrap gap-2">
+                                {["day", "week", "month"].map((type) => (
+                                    <button
+                                        key={type}
+                                        onClick={() => {
+                                            setFilter(type);
+                                            setCurrentPage(1);
+                                        }}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === type
                                             ? "bg-blue-600 text-white shadow-md"
                                             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                        }`}
-                                >
-                                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                                </button>
-                            ))}
-                        </div>
+                                            }`}
+                                    >
+                                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                                    </button>
+                                ))}
+                            </div>
 
-                        {/* Date Filter */}
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-600 font-medium">
-                                Specific Date:
-                            </span>
-                            <input
-                                type="date"
-                                value={dateFilter}
-                                onChange={(e) => {
-                                    setDateFilter(e.target.value);
-                                    setCurrentPage(1);
-                                }}
-                                className="border border-gray-300 px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                            />
+                            {/* Date Filter */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-600 font-medium">
+                                    Specific Date:
+                                </span>
+                                <input
+                                    type="date"
+                                    value={dateFilter}
+                                    onChange={(e) => {
+                                        setDateFilter(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                    className="border border-gray-300 px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Deposits Table */}
-                <div className="bg-white shadow-md rounded-xl overflow-hidden mb-8">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-50">
-                                <tr className="text-gray-600 text-sm">
-                                    <th className="p-4 font-semibold text-left">Transaction</th>
-                                    <th className="p-4 font-semibold text-left">User</th>
-                                    <th className="p-4 font-semibold text-left">Method</th>
-                                    <th className="p-4 font-semibold text-left">Amount</th>
-                                    <th className="p-4 font-semibold text-left">Status</th>
-                                    <th className="p-4 font-semibold text-left">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {paginatedDeposits.length > 0 ? (
-                                    paginatedDeposits.map((d) => (
-                                        <tr
-                                            key={d.id}
-                                            className="hover:bg-gray-50 transition-colors"
-                                        >
-                                            <td className="p-4">
-                                                <div className="flex items-center">
-                                                    <button
-                                                        onClick={() => copyToClipboard(d.id)}
-                                                        className="mr-2 text-gray-400 hover:text-blue-500 transition-colors"
-                                                        title="Copy Transaction ID"
-                                                    >
-                                                        <FiCopy className="w-4 h-4" />
-                                                    </button>
-                                                    <span className="text-sm font-medium text-gray-700">
-                                                        {d.id}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="flex items-center">
-                                                    <img
-                                                        src={d.user.avatar}
-                                                        alt={d.user.name}
-                                                        className="w-8 h-8 rounded-full mr-3"
-                                                    />
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-900">{d.user.name}</p>
-                                                        <p className="text-xs text-gray-500">{d.user.email}</p>
+                    {/* Deposits Table */}
+                    <div className="bg-white shadow-md rounded-xl overflow-hidden mb-8">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr className="text-gray-600 text-sm">
+                                        <th className="p-4 font-semibold text-left">Transaction</th>
+                                        <th className="p-4 font-semibold text-left">User</th>
+                                        <th className="p-4 font-semibold text-left">Method</th>
+                                        <th className="p-4 font-semibold text-left">Amount</th>
+                                        <th className="p-4 font-semibold text-left">Status</th>
+                                        <th className="p-4 font-semibold text-left">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {paginatedDeposits.length > 0 ? (
+                                        paginatedDeposits.map((d) => (
+                                            <tr
+                                                key={d.id}
+                                                className="hover:bg-gray-50 transition-colors"
+                                            >
+                                                <td className="p-4">
+                                                    <div className="flex items-center">
+                                                        <button
+                                                            onClick={() => copyToClipboard(d.id)}
+                                                            className="mr-2 text-gray-400 hover:text-blue-500 transition-colors"
+                                                            title="Copy Transaction ID"
+                                                        >
+                                                            <FiCopy className="w-4 h-4" />
+                                                        </button>
+                                                        <span className="text-sm font-medium text-gray-700">
+                                                            {d.id}
+                                                        </span>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="p-4">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${d.method.color}`}>
-                                                    <span className="mr-1">{d.method.icon}</span>
-                                                    {d.method.name}
-                                                </span>
-                                            </td>
-                                            <td className="p-4">
-                                                <p className="text-sm font-semibold text-gray-900">
-                                                    {currency(d.amount, d.currency)}
-                                                </p>
-                                                {d.fee > 0 && (
-                                                    <p className="text-xs text-gray-500">
-                                                        Fee: {currency(d.fee, d.currency)}
+                                                </td>
+                                                <td className="p-4">
+                                                    <div className="flex items-center">
+                                                        <img
+                                                            src={d.user.avatar}
+                                                            alt={d.user.name}
+                                                            className="w-8 h-8 rounded-full mr-3"
+                                                        />
+                                                        <div>
+                                                            <p className="text-sm font-medium text-gray-900">{d.user.name}</p>
+                                                            <p className="text-xs text-gray-500">{d.user.email}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="p-4">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${d.method.color}`}>
+                                                        <span className="mr-1">{d.method.icon}</span>
+                                                        {d.method.name}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4">
+                                                    <p className="text-sm font-semibold text-gray-900">
+                                                        {currency(d.amount, d.currency)}
                                                     </p>
-                                                )}
-                                            </td>
-                                            <td className="p-4">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[d.status].bg} ${statusStyles[d.status].text}`}>
-                                                    <span className={`w-2 h-2 rounded-full ${statusStyles[d.status].dot} mr-1.5`}></span>
-                                                    {d.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-4">
-                                                <p className="text-sm text-gray-900">
-                                                    {new Date(d.createdAt).toLocaleDateString('en-US', {
-                                                        month: 'short',
-                                                        day: 'numeric'
-                                                    })}
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {new Date(d.createdAt).toLocaleTimeString('en-US', {
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                    })}
-                                                </p>
+                                                    {d.fee > 0 && (
+                                                        <p className="text-xs text-gray-500">
+                                                            Fee: {currency(d.fee, d.currency)}
+                                                        </p>
+                                                    )}
+                                                </td>
+                                                <td className="p-4">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[d.status].bg} ${statusStyles[d.status].text}`}>
+                                                        <span className={`w-2 h-2 rounded-full ${statusStyles[d.status].dot} mr-1.5`}></span>
+                                                        {d.status}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4">
+                                                    <p className="text-sm text-gray-900">
+                                                        {new Date(d.createdAt).toLocaleDateString('en-US', {
+                                                            month: 'short',
+                                                            day: 'numeric'
+                                                        })}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {new Date(d.createdAt).toLocaleTimeString('en-US', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td
+                                                className="p-4 text-center text-gray-500 text-sm"
+                                                colSpan="6"
+                                            >
+                                                No deposit records found
                                             </td>
                                         </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td
-                                            className="p-4 text-center text-gray-500 text-sm"
-                                            colSpan="6"
-                                        >
-                                            No deposit records found
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
 
-                    {/* Pagination */}
-                    {filteredDeposits.length > 0 && (
-                        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-                            <div className="text-sm text-gray-500">
-                                Showing{" "}
-                                <span className="font-medium">
-                                    {(currentPage - 1) * itemsPerPage + 1}
-                                </span>{" "}
-                                to{" "}
-                                <span className="font-medium">
-                                    {Math.min(currentPage * itemsPerPage, filteredDeposits.length)}
-                                </span>{" "}
-                                of <span className="font-medium">{filteredDeposits.length}</span>{" "}
-                                results
-                            </div>
-                            <div className="flex space-x-2">
-                                <button
-                                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                                    disabled={currentPage === 1}
-                                    className={`px-3 py-1 rounded-md text-sm ${currentPage === 1
+                        {/* Pagination */}
+                        {filteredDeposits.length > 0 && (
+                            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+                                <div className="text-sm text-gray-500">
+                                    Showing{" "}
+                                    <span className="font-medium">
+                                        {(currentPage - 1) * itemsPerPage + 1}
+                                    </span>{" "}
+                                    to{" "}
+                                    <span className="font-medium">
+                                        {Math.min(currentPage * itemsPerPage, filteredDeposits.length)}
+                                    </span>{" "}
+                                    of <span className="font-medium">{filteredDeposits.length}</span>{" "}
+                                    results
+                                </div>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                        disabled={currentPage === 1}
+                                        className={`px-3 py-1 rounded-md text-sm ${currentPage === 1
                                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                        }`}
-                                >
-                                    Previous
-                                </button>
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                                    (page) => (
-                                        <button
-                                            key={page}
-                                            onClick={() => setCurrentPage(page)}
-                                            className={`px-3 py-1 rounded-md text-sm ${currentPage === page
+                                            }`}
+                                    >
+                                        Previous
+                                    </button>
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                                        (page) => (
+                                            <button
+                                                key={page}
+                                                onClick={() => setCurrentPage(page)}
+                                                className={`px-3 py-1 rounded-md text-sm ${currentPage === page
                                                     ? "bg-blue-600 text-white"
                                                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                                }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    )
-                                )}
-                                <button
-                                    onClick={() =>
-                                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                                    }
-                                    disabled={currentPage === totalPages}
-                                    className={`px-3 py-1 rounded-md text-sm ${currentPage === totalPages
+                                                    }`}
+                                            >
+                                                {page}
+                                            </button>
+                                        )
+                                    )}
+                                    <button
+                                        onClick={() =>
+                                            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                                        }
+                                        disabled={currentPage === totalPages}
+                                        className={`px-3 py-1 rounded-md text-sm ${currentPage === totalPages
                                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                        }`}
-                                >
-                                    Next
-                                </button>
+                                            }`}
+                                    >
+                                        Next
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
+
         </div>
     );
 };

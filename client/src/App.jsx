@@ -27,10 +27,9 @@ function App() {
         {/* Protected routes */}
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/userinformation" element={<UserInformation />} />
           <Route path="/myaccount" element={<Myaccount />} />
           <Route path="/selfwithdrawl" element={<SelfWithdrawl />} />
-          <Route path="/userInformation" element={<UserInformation/>} />
+          <Route path="/userInformation" element={<UserInformation />} />
         </Route>
       </Routes>
     </Router>

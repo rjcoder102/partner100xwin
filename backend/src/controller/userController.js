@@ -427,10 +427,13 @@ export const getDipositeData = async (req, res) => {
         const [depositRows] = await pool2.query(`SELECT * ${baseQuery}`, values);
         const [totalRows] = await pool2.query(`SELECT SUM(amount) as totalAmount ${baseQuery}`, values);
 
+        const totalAmount = totalRows[0]?.totalAmount || 0
+
         res.json({
+            success: true,
             userInfo,
-            downlineDeposites: depositRows,
-            totalAmount: totalRows[0]?.totalAmount || 0
+            depositRows,
+            totalAmount
         });
     } catch (error) {
         console.error("Error fetching downline deposits:", error);

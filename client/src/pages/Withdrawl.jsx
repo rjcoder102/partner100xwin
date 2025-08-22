@@ -128,7 +128,7 @@ const Withdrawl = () => {
         const successful = filteredWithdrawals.filter(
             (w) => w.status === "Success"
         ).length;
-        
+
         // Calculate unique users
         const uniqueUsers = new Set(filteredWithdrawals.map(w => w.user)).size;
 
@@ -199,11 +199,10 @@ const Withdrawl = () => {
                                         setFilter(type);
                                         setCurrentPage(1);
                                     }}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                        filter === type
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === type
                                             ? "bg-blue-600 text-white shadow-md"
                                             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                    }`}
+                                        }`}
                                 >
                                     {type.charAt(0).toUpperCase() + type.slice(1)}
                                 </button>
@@ -258,13 +257,12 @@ const Withdrawl = () => {
                                             </td>
                                             <td className="p-4">
                                                 <span
-                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                                        w.status === "Success"
+                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${w.status === "Success"
                                                             ? "bg-green-100 text-green-800"
                                                             : w.status === "Pending"
                                                                 ? "bg-yellow-100 text-yellow-800"
                                                                 : "bg-red-100 text-red-800"
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {w.status}
                                                 </span>
@@ -304,11 +302,10 @@ const Withdrawl = () => {
                                 <button
                                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                     disabled={currentPage === 1}
-                                    className={`px-3 py-1 rounded-md text-sm ${
-                                        currentPage === 1
+                                    className={`px-3 py-1 rounded-md text-sm ${currentPage === 1
                                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                    }`}
+                                        }`}
                                 >
                                     Previous
                                 </button>
@@ -317,11 +314,10 @@ const Withdrawl = () => {
                                         <button
                                             key={page}
                                             onClick={() => setCurrentPage(page)}
-                                            className={`px-3 py-1 rounded-md text-sm ${
-                                                currentPage === page
+                                            className={`px-3 py-1 rounded-md text-sm ${currentPage === page
                                                     ? "bg-blue-600 text-white"
                                                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                            }`}
+                                                }`}
                                         >
                                             {page}
                                         </button>
@@ -332,11 +328,10 @@ const Withdrawl = () => {
                                         setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                                     }
                                     disabled={currentPage === totalPages}
-                                    className={`px-3 py-1 rounded-md text-sm ${
-                                        currentPage === totalPages
+                                    className={`px-3 py-1 rounded-md text-sm ${currentPage === totalPages
                                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                    }`}
+                                        }`}
                                 >
                                     Next
                                 </button>

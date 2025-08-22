@@ -85,7 +85,7 @@ const Dashboard = () => {
                         src="https://quotex-partner.com/affiliate_site/images/landing/header-logo.svg"
                         alt="logo"
                     />
-                </div>  
+                </div>
 
                 <nav className="pt-7">
                     <ul className="space-y-2">
