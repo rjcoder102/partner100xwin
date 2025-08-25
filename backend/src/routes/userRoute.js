@@ -38,6 +38,6 @@ router.get("/get-bet-history", gameHistory);
 // router.post("/update-leve", updateAllUserLevels);
 router.post("/logout", logoutUser);
 
-router.get("/get-single-user/detale/:id", getSingleUserDetails)
+router.get("    /:id", getSingleUserDetails)
 
 export default router;
