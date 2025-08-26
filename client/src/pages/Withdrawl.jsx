@@ -5,9 +5,14 @@ import { getDownlineWithdrawals } from "../Redux/reducer/withdrawlSlicer";
 const Withdrawl = () => {
     const dispatch = useDispatch();
 
-    // ✅ Get withdrawals state from Redux
-    const  withdrawals  = useSelector((state) => state.withdrawal);
-    console.log("Withdrawals data: ", withdrawals);
+    // ✅ Get withdrawals state from Redux - fixed selector
+    const withdrawalState = useSelector((state) => state.withrawal);
+    const downlineWithdrawals = withdrawalState.downlineWithdrawals;
+    
+    // Extract the withdrawals data with proper null checks
+    const withdrawalsData = downlineWithdrawals?.data?.downlineWithdrowal || [];
+    const loading = downlineWithdrawals?.loading || false;
+    const error = downlineWithdrawals?.error || null;
 
     // Local UI states
     const [filter, setFilter] = useState("month"); // day | week | month
@@ -27,37 +32,37 @@ const Withdrawl = () => {
         dispatch(getDownlineWithdrawals(filters));
     }, [dispatch, filter, startDate, endDate]);
 
-    // ✅ Filtering logic
+    // ✅ Filtering logic - fixed to work with API data structure
     const filteredWithdrawals = useMemo(() => {
-        if (!withdrawals) return [];
+        if (!withdrawalsData || withdrawalsData.length === 0) return [];
 
-        let data = [...withdrawals];
+        let data = [...withdrawalsData];
         const today = new Date();
 
         if (filter === "day") {
             data = data.filter(
-                (w) => new Date(w.date).toDateString() === today.toDateString()
+                (w) => new Date(w.updated_at).toDateString() === today.toDateString()
             );
         } else if (filter === "week") {
             const weekAgo = new Date();
             weekAgo.setDate(today.getDate() - 7);
             data = data.filter(
-                (w) => new Date(w.date) >= weekAgo && new Date(w.date) <= today
+                (w) => new Date(w.updated_at) >= weekAgo && new Date(w.updated_at) <= today
             );
         } else if (filter === "month") {
             const monthAgo = new Date();
             monthAgo.setMonth(today.getMonth() - 1);
             data = data.filter(
-                (w) => new Date(w.date) >= monthAgo && new Date(w.date) <= today
+                (w) => new Date(w.updated_at) >= monthAgo && new Date(w.updated_at) <= today
             );
         }
 
         if (dateFilter) {
-            data = data.filter((w) => w.date === dateFilter);
+            data = data.filter((w) => new Date(w.updated_at).toISOString().split('T')[0] === dateFilter);
         }
 
         return data;
-    }, [withdrawals, filter, dateFilter]);
+    }, [withdrawalsData, filter, dateFilter]);
 
     // ✅ Pagination
     const totalPages = Math.ceil(filteredWithdrawals.length / itemsPerPage);
@@ -66,7 +71,7 @@ const Withdrawl = () => {
         return filteredWithdrawals.slice(startIndex, startIndex + itemsPerPage);
     }, [filteredWithdrawals, currentPage]);
 
-    // ✅ Summary cards
+    // ✅ Summary cards - fixed to work with API data structure
     const summary = useMemo(() => {
         const totalWithdrawals = filteredWithdrawals.length;
         const totalAmount = filteredWithdrawals.reduce(
@@ -74,30 +79,30 @@ const Withdrawl = () => {
             0
         );
         const successful = filteredWithdrawals.filter(
-            (w) => w.status === "Success"
+            (w) => w.status === 1 // Assuming status 1 means success
         ).length;
 
-        const uniqueUsers = new Set(filteredWithdrawals.map((w) => w.user)).size;
+        const uniqueUsers = new Set(filteredWithdrawals.map((w) => w.user_id)).size;
 
         return { totalWithdrawals, totalAmount, successful, uniqueUsers };
     }, [filteredWithdrawals]);
 
     // ✅ Show loading / error
-    // if (loading) {
-    //     return (
-    //         <div className="min-h-screen flex items-center justify-center text-xl text-gray-600">
-    //             Loading withdrawal data...
-    //         </div>
-    //     );
-    // }
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center text-xl text-gray-600">
+                Loading withdrawal data...
+            </div>
+        );
+    }
 
-    // if (error) {
-    //     return (
-    //         <div className="min-h-screen flex items-center justify-center text-xl text-red-600">
-    //             Error: {error.message || "Failed to load withdrawal data"}
-    //         </div>
-    //     );
-    // }
+    if (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center text-xl text-red-600">
+                Error: {error.message || "Failed to load withdrawal data"}
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen">
@@ -140,11 +145,10 @@ const Withdrawl = () => {
                                         setFilter(type);
                                         setCurrentPage(1);
                                     }}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                        filter === type
-                                            ? "bg-blue-600 text-white shadow-md"
-                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                    }`}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === type
+                                        ? "bg-blue-600 text-white shadow-md"
+                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                        }`}
                                 >
                                     {type.charAt(0).toUpperCase() + type.slice(1)}
                                 </button>
@@ -189,22 +193,21 @@ const Withdrawl = () => {
                                             className="hover:bg-gray-50 transition-colors"
                                         >
                                             <td className="p-4 text-sm font-medium text-gray-700">{w.id}</td>
-                                            <td className="p-4 text-sm text-gray-600">{w.user}</td>
-                                            <td className="p-4 text-sm text-gray-600">{w.date}</td>
+                                            <td className="p-4 text-sm text-gray-600">{w.username}</td>
+                                            <td className="p-4 text-sm text-gray-600">
+                                                {new Date(w.updated_at).toLocaleDateString()}
+                                            </td>
                                             <td className="p-4 text-sm font-medium text-gray-700">
                                                 ₹{w.amount.toLocaleString()}
                                             </td>
                                             <td className="p-4">
                                                 <span
-                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                                        w.status === "Success"
-                                                            ? "bg-green-100 text-green-800"
-                                                            : w.status === "Pending"
-                                                            ? "bg-yellow-100 text-yellow-800"
-                                                            : "bg-red-100 text-red-800"
-                                                    }`}
+                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${w.status === 1
+                                                        ? "bg-green-100 text-green-800"
+                                                        : "bg-yellow-100 text-yellow-800"
+                                                        }`}
                                                 >
-                                                    {w.status}
+                                                    {w.status === 1 ? "Success" : "Pending"}
                                                 </span>
                                             </td>
                                         </tr>
@@ -242,11 +245,10 @@ const Withdrawl = () => {
                                 <button
                                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                     disabled={currentPage === 1}
-                                    className={`px-3 py-1 rounded-md text-sm ${
-                                        currentPage === 1
-                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                    }`}
+                                    className={`px-3 py-1 rounded-md text-sm ${currentPage === 1
+                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                        }`}
                                 >
                                     Previous
                                 </button>
@@ -254,11 +256,10 @@ const Withdrawl = () => {
                                     <button
                                         key={page}
                                         onClick={() => setCurrentPage(page)}
-                                        className={`px-3 py-1 rounded-md text-sm ${
-                                            currentPage === page
-                                                ? "bg-blue-600 text-white"
-                                                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                        }`}
+                                        className={`px-3 py-1 rounded-md text-sm ${currentPage === page
+                                            ? "bg-blue-600 text-white"
+                                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                            }`}
                                     >
                                         {page}
                                     </button>
@@ -268,11 +269,10 @@ const Withdrawl = () => {
                                         setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                                     }
                                     disabled={currentPage === totalPages}
-                                    className={`px-3 py-1 rounded-md text-sm ${
-                                        currentPage === totalPages
-                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                    }`}
+                                    className={`px-3 py-1 rounded-md text-sm ${currentPage === totalPages
+                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                        }`}
                                 >
                                     Next
                                 </button>
@@ -286,3 +286,63 @@ const Withdrawl = () => {
 };
 
 export default Withdrawl;
+
+
+
+// {
+//     "loading": false,
+//     "success": false,
+//     "error": null,
+//     "withdrawal": null,
+//     "downlineDeposits": {
+//         "data": [],
+//         "loading": false,
+//         "error": null
+//     },
+//     "downlineWithdrawals": {
+//         "data": {
+//             "userInfo": {
+//                 "id": 24,
+//                 "email": "surajbhai@gmail.com",
+//                 "code": "1678302408"
+//             },
+//             "downlineWithdrowal": [
+//                 {
+//                     "id": 49,
+//                     "user_id": 1984,
+//                     "admin_id": 1,
+//                     "amount": 1000,
+//                     "txn_type": "bank",
+//                     "upi": null,
+//                     "account_id": "1234567890",
+//                     "ifsc_code": "rjiuthiu",
+//                     "bank_name": "gjh8urhu",
+//                     "branch": "rhjiuhui",
+//                     "username": "bhai3",
+//                     "refral_code": "1678302408",
+//                     "status": 1,
+//                     "updated_at": "2025-08-19T08:16:13.000Z"
+//                 },
+//                 {
+//                     "id": 50,
+//                     "user_id": 1984,
+//                     "admin_id": 1,
+//                     "amount": 1000,
+//                     "txn_type": "bank",
+//                     "upi": null,
+//                     "account_id": "1234567890",
+//                     "ifsc_code": "rjiuthiu",
+//                     "bank_name": "gjh8urhu",
+//                     "branch": "rhjiuhui",
+//                     "username": "bhai3",
+//                     "refral_code": "1678302408",
+//                     "status": 1,
+//                     "updated_at": "2025-08-19T08:16:32.000Z"
+//                 }
+//             ],
+//             "totalAmount": 2000
+//         },
+//         "loading": false,
+//         "error": null
+//     }
+// }

@@ -1,8 +1,16 @@
-import React, { useState } from "react";
-import DashboardHeader from "../components/DashboardHeader";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchGameHistory } from "../Redux/reducer/downlineSlicer";
 
 const UserInformation = () => {
     const [activeTab, setActiveTab] = useState("info"); // default active tab
+    const dispatch = useDispatch();
+
+    // Redux state
+    // const { data, loading, error } = useSelector((state) => state.gameHistory);
+    const data = useSelector((state) => state.gameHistory);
+    const loading = loading || false;
+    const error = error || null;
 
     // Sample user data
     const userData = {
@@ -11,12 +19,18 @@ const UserInformation = () => {
         lastLoginDate: "Aug 21, 2025 14:30",
         totalDeposit: "$5,200.00",
         totalWithdrawal: "$2,750.00",
-        totalRecharge: "$8,950.00"
+        totalRecharge: "$8,950.00",
     };
+
+    // Fetch game history when tab is active
+    useEffect(() => {
+        if (activeTab === "history") {
+            dispatch(fetchGameHistory({ page: 1, size: 50 }));
+        }
+    }, [activeTab, dispatch]);
 
     return (
         <div className="min-h-screen">
-            {/* Main Content */}
             <div className="container mx-auto max-w-6xl pt-6">
                 {/* Tabs */}
                 <div className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
@@ -45,8 +59,9 @@ const UserInformation = () => {
                     <div className="p-6">
                         {activeTab === "info" && (
                             <div>
-                                <h2 className="text-2xl font-bold mb-6 text-gray-800">User Information</h2>
-
+                                <h2 className="text-2xl font-bold mb-6 text-gray-800">
+                                    User Information
+                                </h2>
                                 {/* User Details Card */}
                                 <div className="bg-blue-50 rounded-lg p-6 mb-8 border border-blue-100">
                                     <div className="flex flex-col md:flex-row items-center mb-6">
@@ -60,7 +75,6 @@ const UserInformation = () => {
                                         </div>
                                     </div>
                                 </div>
-
                                 {/* Financial Information Table */}
                                 <h3 className="text-xl font-semibold mb-4 text-gray-800">Financial Information</h3>
                                 <div className="overflow-x-auto rounded-lg shadow">
@@ -87,74 +101,69 @@ const UserInformation = () => {
                                         </tbody>
                                     </table>
                                 </div>
-
-                                {/* Stats Cards */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                                    <div className="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
-                                        <h4 className="text-gray-500 text-sm font-medium">Available Balance</h4>
-                                        <p className="text-2xl font-bold text-gray-800 mt-2">$2,450.00</p>
-                                    </div>
-                                    <div className="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
-                                        <h4 className="text-gray-500 text-sm font-medium">Total Wins</h4>
-                                        <p className="text-2xl font-bold text-gray-800 mt-2">$8,720.00</p>
-                                    </div>
-                                    <div className="bg-white p-6 rounded-lg shadow border-l-4 border-purple-500">
-                                        <h4 className="text-gray-500 text-sm font-medium">Active Bets</h4>
-                                        <p className="text-2xl font-bold text-gray-800 mt-2">3</p>
-                                    </div>
-                                </div>
                             </div>
                         )}
 
                         {activeTab === "history" && (
                             <div>
                                 <h2 className="text-2xl font-bold mb-6 text-gray-800">Bet History</h2>
-                                <div className="overflow-x-auto rounded-lg shadow">
-                                    <table className="w-full border-collapse bg-white">
-                                        <thead>
-                                            <tr className="bg-gray-50">
-                                                <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Date</th>
-                                                <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Event</th>
-                                                <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Bet Amount</th>
-                                                <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Odds</th>
-                                                <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Potential Win</th>
-                                                <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr className="hover:bg-gray-50 transition-colors">
-                                                <td className="py-3 px-4 border-b border-gray-200">2025-08-21 14:30</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">Manchester United vs Chelsea</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">$50.00</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">2.5</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">$125.00</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">
-                                                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Won</span>
-                                                </td>
-                                            </tr>
-                                            <tr className="hover:bg-gray-50 transition-colors">
-                                                <td className="py-3 px-4 border-b border-gray-200">2025-08-20 21:15</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">LA Lakers vs Chicago Bulls</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">$30.00</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">1.8</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">$54.00</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">
-                                                    <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">Lost</span>
-                                                </td>
-                                            </tr>
-                                            <tr className="hover:bg-gray-50 transition-colors">
-                                                <td className="py-3 px-4 border-b border-gray-200">2025-08-19 19:45</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">Djokovic vs Nadal</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">$75.00</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">3.2</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">$240.00</td>
-                                                <td className="py-3 px-4 border-b border-gray-200">
-                                                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Pending</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+
+                                {/* Loading */}
+                                {loading && (
+                                    <div className="text-center py-10 text-gray-600">Loading game history...</div>
+                                )}
+
+                                {/* Error */}
+                                {error && (
+                                    <div className="text-center py-10 text-red-600">
+                                        Error: {error.message || error}
+                                    </div>
+                                )}
+
+                                {/* Data Table */}
+                                {!loading && !error && data?.data?.length > 0 && (
+                                    <div className="overflow-x-auto rounded-lg shadow">
+                                        <table className="w-full border-collapse bg-white">
+                                            <thead>
+                                                <tr className="bg-gray-50">
+                                                    <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Date</th>
+                                                    <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Event</th>
+                                                    <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Bet Amount</th>
+                                                    <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Odds</th>
+                                                    <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Potential Win</th>
+                                                    <th className="py-3 px-4 text-left font-semibold text-gray-700 border-b border-gray-200">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {data.data.map((bet) => (
+                                                    <tr key={bet.id} className="hover:bg-gray-50 transition-colors">
+                                                        <td className="py-3 px-4 border-b border-gray-200">{bet.date}</td>
+                                                        <td className="py-3 px-4 border-b border-gray-200">{bet.event}</td>
+                                                        <td className="py-3 px-4 border-b border-gray-200">${bet.betAmount}</td>
+                                                        <td className="py-3 px-4 border-b border-gray-200">{bet.odds}</td>
+                                                        <td className="py-3 px-4 border-b border-gray-200">${bet.potentialWin}</td>
+                                                        <td className="py-3 px-4 border-b border-gray-200">
+                                                            <span
+                                                                className={`px-2 py-1 text-xs font-medium rounded-full ${bet.status === "Won"
+                                                                    ? "bg-green-100 text-green-800"
+                                                                    : bet.status === "Lost"
+                                                                        ? "bg-red-100 text-red-800"
+                                                                        : "bg-yellow-100 text-yellow-800"
+                                                                    }`}
+                                                            >
+                                                                {bet.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+
+                                {!loading && !error && data?.data?.length === 0 && (
+                                    <div className="text-center py-10 text-gray-500">No bet history found.</div>
+                                )}
                             </div>
                         )}
                     </div>

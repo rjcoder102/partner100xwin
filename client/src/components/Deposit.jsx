@@ -7,8 +7,6 @@ const Deposit = () => {
     const dispatch = useDispatch();
     const deposits = useSelector(state => state.deposits);
     const { downlineDeposits } = useSelector(state => state.withrawal);
-    console.log("response data main", downlineDeposits);
-
     const [filter, setFilter] = useState("month");
     const [dateFilter, setDateFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +42,6 @@ const Deposit = () => {
             filters.startDate = dateFilter;
             filters.endDate = dateFilter;
         }
-
         dispatch(getDownlineDeposits(filters));
     }, [dispatch, filter, dateFilter]);
 

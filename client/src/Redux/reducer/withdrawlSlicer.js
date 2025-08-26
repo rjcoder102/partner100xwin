@@ -39,7 +39,7 @@ export const getDownlineDeposits = createAsyncThunk(
                 { withCredentials: true }
             );
 
-            console.log("API Response111kkk:", response.data);
+            // console.log("API Response111kkk:", response.data);
 
             // Handle different possible response structures
             return response.data
@@ -54,7 +54,7 @@ export const getDownlineDeposits = createAsyncThunk(
 // ✅ Thunk to get downline withdrawal data
 export const getDownlineWithdrawals = createAsyncThunk(
     "transactions/getDownlineWithdrawals",
-    async (filters = {}, { rejectWithValue }) => {
+    async (filters, { rejectWithValue }) => {
         try {
             const { filter, startDate, endDate } = filters;
             const params = new URLSearchParams();
@@ -63,15 +63,17 @@ export const getDownlineWithdrawals = createAsyncThunk(
             if (startDate) params.append('startDate', startDate);
             if (endDate) params.append('endDate', endDate);
 
-            const response = await api.get(
+            const {data} = await api.get(
                 `/auth/get-downline-withdrowal?${params.toString()}`,
                 { withCredentials: true }
             );
             
-            console.log("Withdrawal response data:", response.data);
+            console.log("Withdrawal response data:", data);
+            
+            // console.log("Withdrawal response:", response);
             
             // Handle different possible response structures
-            return response.data;
+            return data;
         } catch (error) {
             return rejectWithValue(
                 error.response?.data || { message: "Failed to fetch withdrawal data" }
@@ -161,9 +163,9 @@ const withdrawalSlice = createSlice({
                 state.downlineWithdrawals.error = null;
             })
             .addCase(getDownlineWithdrawals.fulfilled, (state, action) => {
-                 console.log("asdfghjkl",action.payload);
+                //  console.log("asdfghjkl123456789",action.payload);
                 state.downlineWithdrawals.loading = false;
-                state.downlineWithdrawals.data = action.payload;
+                state.downlineWithdrawals.data = action.payload
             })
             .addCase(getDownlineWithdrawals.rejected, (state, action) => {
                 state.downlineWithdrawals.loading = false;

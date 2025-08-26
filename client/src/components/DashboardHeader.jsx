@@ -75,8 +75,6 @@ const DashboardHeader = () => {
     const queryParams = new URLSearchParams(location.search);
     const redirect = queryParams.get("redirect");
 
-    console.log("Redirect:", redirect);
-
     return (
         <div className=''>
             {/* phone device */}

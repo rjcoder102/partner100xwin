@@ -2,16 +2,17 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createWithdrawal } from "../Redux/reducer/withdrawlSlicer";
 
-
 const WithdrawalPage = () => {
     const dispatch = useDispatch();
-    const createWithdrawal = useSelector((state) => state.withdrawal);
 
     const [amount, setAmount] = useState("");
     const [usdtAddress, setUsdtAddress] = useState("");
-    const [selectedMethod, setSelectedMethod] = useState("usdt");
+    const [selectedMethod, setSelectedMethod] = useState("");
 
-    const handleWithdraw = async () => {
+    const handleWithdraw = async (e) => {
+        e.preventDefault();
+        // console.log("✅ Withdrawal Request:", amount, usdtAddress);
+
         if (!amount || !usdtAddress) {
             alert("Please enter amount and USDT address");
             return;
@@ -20,19 +21,22 @@ const WithdrawalPage = () => {
         try {
             const response = await dispatch(
                 createWithdrawal({ amount, usdt_address: usdtAddress })
-            ).unwrap(); // unwrap will throw if rejected
+            ).unwrap();
 
-            alert(`Withdrawal request submitted!\nAmount: $${response.amount}\nStatus: ${response.status}`);
+            alert(
+                `Withdrawal request submitted!\nAmount: $${response.amount}\nStatus: ${response.status}`
+            );
+
             setAmount("");
             setUsdtAddress("");
         } catch (err) {
+            console.error("❌ Withdrawal Error:", err);
             alert(`Error: ${err.message || "Something went wrong"}`);
         }
     };
 
     return (
         <div className="min-h-screen bg-gray-200">
-
             <div className="max-w-6xl mx-auto pt-4">
                 {/* Alert Banner */}
                 <div className="bg-gradient-to-r from-red-500 to-orange-500 text-gray-50 p-2 rounded-lg mb-4 flex items-start gap-3 shadow-md">
@@ -75,10 +79,8 @@ const WithdrawalPage = () => {
                                             <span className="text-sm font-medium">USDT</span>
                                         </button>
                                         <button
-                                            onClick={handleWithdraw}
-                                            disabled={!amount || !usdtAddress || loading}
-                                            className={`w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-lg font-medium shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed`}
-
+                                            onClick={() => setSelectedMethod("bank")}
+                                            className={`p-3 border rounded-lg flex items-center justify-center gap-2 transition-all ${selectedMethod === "bank" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300"}`}
                                         >
                                             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,9 +119,9 @@ const WithdrawalPage = () => {
                                     </label>
                                     <input
                                         type="text"
-                                        placeholder="Enter your USDT wallet address"
                                         value={usdtAddress}
                                         onChange={(e) => setUsdtAddress(e.target.value)}
+                                        placeholder="Enter your USDT address"
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                                     />
                                 </div>
@@ -144,10 +146,11 @@ const WithdrawalPage = () => {
                                 {/* Submit Button */}
                                 <button
                                     onClick={handleWithdraw}
-                                    disabled={!amount || !usdtAddress}
+                                    disabled={!amount || !usdtAddress }
                                     className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-lg font-medium shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    Request Withdrawal
+                                    {/* {loading ?"Processing..." : "Request Withdrawal"} */}
+                                    Processing...
                                 </button>
                             </div>
                         </div>
@@ -155,47 +158,52 @@ const WithdrawalPage = () => {
                         {/* FAQ Section */}
                         <div className="bg-white rounded-xl shadow-md p-6 mt-8">
                             <h2 className="text-xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-100">Frequently Asked Questions</h2>
-                            <div className="space-y-6">
-                                {[
-                                    {
-                                        question: "How do I add a method to withdraw commission?",
-                                        answer: "Go to the Account section → Wallets → Add New. Select the method, fill in details, and click Save."
-                                    },
-                                    {
-                                        question: "How can I cancel a withdrawal?",
-                                        answer: "Withdrawals with status New can be canceled by contacting support or your manager. Other statuses cannot be canceled."
-                                    },
-                                    {
-                                        question: "The withdrawal has not arrived in full",
-                                        answer: "Bank card withdrawals may arrive in parts. If the full amount does not arrive within 3 days, please contact us."
-                                    },
-                                    {
-                                        question: "What does 'Pending' status mean?",
-                                        answer: "Funds are with the payment provider and may take up to 3 days to be credited."
-                                    },
-                                    {
-                                        question: "What does 'New' status mean?",
-                                        answer: "Your withdrawal request was created and is waiting to be sent. It may take up to 3 days depending on workload."
-                                    },
-                                    {
-                                        question: "Status is 'Complete' but money not received",
-                                        answer: "Crediting can take up to 3 days. If not received after 3 days, contact us."
-                                    }
-                                ].map((faq, index) => (
-                                    <div key={index} className="group">
-                                        <h3 className="font-medium text-gray-800 group-hover:text-blue-600 transition-colors">
-                                            {faq.question}
-                                        </h3>
-                                        <p className="text-gray-600 text-sm mt-1">
-                                            {faq.answer}
-                                        </p>
-                                    </div>
-                                ))}
+                            <div className="bg-white rounded-xl shadow-md p-6 mt-8">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-100">Frequently Asked Questions</h2>
+                                <div className="space-y-6">
+                                    {[
+                                        {
+                                            question: "How do I add a method to withdraw commission?",
+                                            answer: "Go to the Account section → Wallets → Add New. Select the method, fill in details, and click Save."
+                                        },
+                                        {
+                                            question: "How can I cancel a withdrawal?",
+                                            answer: "Withdrawals with status New can be canceled by contacting support or your manager. Other statuses cannot be canceled."
+                                        },
+                                        {
+                                            question: "The withdrawal has not arrived in full",
+                                            answer: "Bank card withdrawals may arrive in parts. If the full amount does not arrive within 3 days, please contact us."
+                                        },
+                                        {
+                                            question: "What does 'Pending' status mean?",
+                                            answer: "Funds are with the payment provider and may take up to 3 days to be credited."
+                                        },
+                                        {
+                                            question: "What does 'New' status mean?",
+                                            answer: "Your withdrawal request was created and is waiting to be sent. It may take up to 3 days depending on workload."
+                                        },
+                                        {
+                                            question: "Status is 'Complete' but money not received",
+                                            answer: "Crediting can take up to 3 days. If not received after 3 days, contact us."
+                                        }
+                                    ].map((faq, index) => (
+                                        <div key={index} className="group">
+                                            <h3 className="font-medium text-gray-800 group-hover:text-blue-600 transition-colors">
+                                                {faq.question}
+                                            </h3>
+                                            <p className="text-gray-600 text-sm mt-1">
+                                                {faq.answer}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column - Information & Help */}
+
+
+                    {/* Right Column - Balance & Help */}
                     <div className="space-y-6">
                         {/* Balance Summary */}
                         <div className="bg-white rounded-xl shadow-md p-6">

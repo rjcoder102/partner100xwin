@@ -19,7 +19,7 @@ export const fetchDownlineUsers = createAsyncThunk(
                 { withCredentials: true }
             );
 
-            console.log("📌 Downline API response:", res.data);
+            // console.log("📌 Downline API response:", res.data);
             return res.data;
         } catch (err) {
             return rejectWithValue(
@@ -29,16 +29,50 @@ export const fetchDownlineUsers = createAsyncThunk(
     }
 );
 
+
+// ✅ Thunk to fetch bet history
+export const fetchGameHistory = createAsyncThunk(
+    "gameHistory/fetchGameHistory",
+    async ({ page = 1, size = 50 }, { rejectWithValue }) => {
+        try {
+            const response = await api.post("/auth/get-bet-history", { page, size });
+              console.log("responseddddddddddd",response.data);
+            return response.data;
+          
+             
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data || { message: "Something went wrong" }
+            );
+        }
+    }
+);
+
+
 const downlineSlice = createSlice({
     name: "downline",
+    name: "gameHistory",
     initialState: {
         users: [],
         loading: false,
         error: null,
     },
+    initialState: {
+        data: null,
+        loading: false,
+        error: null,
+    },
     reducers: {},
+    reducers: {
+        resetHistory: (state) => {
+            state.data = null;
+            state.loading = false;
+            state.error = null;
+        },
+    },
     extraReducers: (builder) => {
         builder
+            //downlineSlice
             .addCase(fetchDownlineUsers.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -52,7 +86,22 @@ const downlineSlice = createSlice({
             .addCase(fetchDownlineUsers.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || "Something went wrong";
+            })
+            //bet history
+            .addCase(fetchGameHistory.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchGameHistory.fulfilled, (state, action) => {
+                state.loading = false;
+                state.data = action.payload?.data || null;
+            })
+            .addCase(fetchGameHistory.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message || "Failed to fetch game history";
             });
+
+
     },
 });
 

@@ -11,7 +11,7 @@ const LinksPage = () => {
 
   const { userInfo, loading } = useSelector((state) => state.auth);
 
-  console.log("from link page", userInfo);
+  // console.log("from link page", userInfo);
 
 
   useEffect(() => {
@@ -178,27 +178,13 @@ const LinksPage = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm"
               />
             </div>
-            <div className="flex justify-between mb-6">
+            <div className="flex justify-end gap-2">
               <button
-                onClick={() => shareVia('whatsapp')}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center transition-colors"
+                onClick={() => window.open(currentShareLink, '_blank')}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
               >
-                <span className="mr-2">WhatsApp</span>
+                Open Link
               </button>
-              <button
-                onClick={() => shareVia('telegram')}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center transition-colors"
-              >
-                <span className="mr-2">Telegram</span>
-              </button>
-              <button
-                onClick={() => shareVia('email')}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md flex items-center transition-colors"
-              >
-                <span className="mr-2">Email</span>
-              </button>
-            </div>
-            <div className="flex justify-end">
               <button
                 onClick={() => setShareModal(false)}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
