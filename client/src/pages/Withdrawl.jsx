@@ -81,8 +81,9 @@ const Withdrawl = () => {
         const successful = filteredWithdrawals.filter(
             (w) => w.status === 1 // Assuming status 1 means success
         ).length;
-
-        const uniqueUsers = new Set(filteredWithdrawals.map((w) => w.user_id)).size;
+        
+        // Calculate unique users
+        const uniqueUsers = new Set(filteredWithdrawals.map(w => w.user)).size;
 
         return { totalWithdrawals, totalAmount, successful, uniqueUsers };
     }, [filteredWithdrawals]);
@@ -145,10 +146,11 @@ const Withdrawl = () => {
                                         setFilter(type);
                                         setCurrentPage(1);
                                     }}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === type
-                                        ? "bg-blue-600 text-white shadow-md"
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                        }`}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                        filter === type
+                                            ? "bg-blue-600 text-white shadow-md"
+                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    }`}
                                 >
                                     {type.charAt(0).toUpperCase() + type.slice(1)}
                                 </button>
@@ -202,10 +204,13 @@ const Withdrawl = () => {
                                             </td>
                                             <td className="p-4">
                                                 <span
-                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${w.status === 1
-                                                        ? "bg-green-100 text-green-800"
-                                                        : "bg-yellow-100 text-yellow-800"
-                                                        }`}
+                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                                        w.status === "Success"
+                                                            ? "bg-green-100 text-green-800"
+                                                            : w.status === "Pending"
+                                                                ? "bg-yellow-100 text-yellow-800"
+                                                                : "bg-red-100 text-red-800"
+                                                    }`}
                                                 >
                                                     {w.status === 1 ? "Success" : "Pending"}
                                                 </span>
@@ -245,34 +250,39 @@ const Withdrawl = () => {
                                 <button
                                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                     disabled={currentPage === 1}
-                                    className={`px-3 py-1 rounded-md text-sm ${currentPage === 1
-                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                        }`}
+                                    className={`px-3 py-1 rounded-md text-sm ${
+                                        currentPage === 1
+                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                    }`}
                                 >
                                     Previous
                                 </button>
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                    <button
-                                        key={page}
-                                        onClick={() => setCurrentPage(page)}
-                                        className={`px-3 py-1 rounded-md text-sm ${currentPage === page
-                                            ? "bg-blue-600 text-white"
-                                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                                    (page) => (
+                                        <button
+                                            key={page}
+                                            onClick={() => setCurrentPage(page)}
+                                            className={`px-3 py-1 rounded-md text-sm ${
+                                                currentPage === page
+                                                    ? "bg-blue-600 text-white"
+                                                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                             }`}
-                                    >
-                                        {page}
-                                    </button>
-                                ))}
+                                        >
+                                            {page}
+                                        </button>
+                                    )
+                                )}
                                 <button
                                     onClick={() =>
                                         setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                                     }
                                     disabled={currentPage === totalPages}
-                                    className={`px-3 py-1 rounded-md text-sm ${currentPage === totalPages
-                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                        }`}
+                                    className={`px-3 py-1 rounded-md text-sm ${
+                                        currentPage === totalPages
+                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                    }`}
                                 >
                                     Next
                                 </button>

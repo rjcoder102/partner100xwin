@@ -54,6 +54,7 @@ const downlineSlice = createSlice({
     name: "gameHistory",
     initialState: {
         users: [],
+        depositeData: [],
         loading: false,
         error: null,
     },

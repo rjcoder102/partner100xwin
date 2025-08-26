@@ -12,6 +12,24 @@ const Deposit = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
+    const [filter, setFilter] = useState("month"); // day, week, month
+    const [dateFilter, setDateFilter] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+    const [search, setSearch] = useState("");
+
+    const dispatch = useDispatch();
+
+    // Redux store se users + loading + error
+    const { depositeData, loading, error } = useSelector((state) => state.downline);
+
+    console.log("depositeData", depositeData?.depositRows?.length);
+
+    // ✅ API call
+    useEffect(() => {
+        dispatch(fetchDownlineDeposte(filter));
+    }, [dispatch, filter]);
+
     const statusStyles = {
         Completed: { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
         Pending: { bg: "bg-yellow-100", text: "text-yellow-800", dot: "bg-yellow-500" },
@@ -222,7 +240,6 @@ const Deposit = () => {
                             )}
                         </div>
                     </div>
-                </div>
 
                 {/* Deposits Table */}
                 <div className="bg-white shadow-md rounded-xl overflow-hidden mb-8">
@@ -378,10 +395,11 @@ const Deposit = () => {
                                     Next
                                 </button>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
+
         </div>
     );
 };

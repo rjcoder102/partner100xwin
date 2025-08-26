@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { pool1, pool2 } from "../../config/db.js";
 import nodemailer from "nodemailer";
 import axios from "axios"
+import { log } from "console";
 
 
 const JWT_SECRET = process.env.JWT_SECRET || "suraj1234";
@@ -426,10 +427,13 @@ export const getDipositeData = async (req, res) => {
         const [depositRows] = await pool2.query(`SELECT * ${baseQuery}`, values);
         const [totalRows] = await pool2.query(`SELECT SUM(amount) as totalAmount ${baseQuery}`, values);
 
+        const totalAmount = totalRows[0]?.totalAmount || 0
+
         res.json({
+            success: true,
             userInfo,
-            downlineDeposites: depositRows,
-            totalAmount: totalRows[0]?.totalAmount || 0
+            depositRows,
+            totalAmount
         });
     } catch (error) {
         console.error("Error fetching downline deposits:", error);
@@ -667,6 +671,38 @@ export const logoutUser = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
+export const getSingleUserDetails = async (req, res) => {
+    const { id } = req.params;
+    // console.log("id", id);
+
+    try {
+
+        const [rows] = await pool2.query(
+            "SELECT * FROM users WHERE id = ?",
+            [id]
+        );
+        const [depositRows] = await pool2.query(`SELECT * FROM depositrequests WHERE user_id = ? AND status = 1`, id);
+        const [totalRows] = await pool2.query(`SELECT SUM(amount) as totalAmount  FROM depositrequests WHERE user_id = ? AND status = 1`, id);
+        const [withRows] = await pool2.query(`SELECT * FROM withdrawrequests WHERE user_id = ? AND status = 1`, id);
+        const [totalWithRows] = await pool2.query(`SELECT SUM(amount) as totalAmount  FROM withdrawrequests WHERE user_id = ? AND status = 1`, id);
+
+        return res.status(200).json({
+            success: true,
+            user: rows[0],
+            depositesLength: depositRows.length,
+            totalDepositeAmount: totalRows[0]?.totalAmount || 0,
+            withLength: withRows.length,
+            totalwithAmount: totalWithRows[0]?.totalAmount || 0
+        });
+
+
+    } catch (error) {
+        console.error("Get User Error:", error);
+        return res.status(500).json({ message: "Server error" });
+    }
+}
 
 
 
