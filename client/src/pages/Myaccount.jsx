@@ -49,12 +49,9 @@ const Myaccount = () => {
 
     return (
         <>
-            <div>
-                <DashboardHeader />
-            </div>
-            <div className="flex flex-col md:flex-row gap-6 bg-gray-200 p-6 rounded-lg shadow-md">
+            <div className="flex flex-col md:flex-row gap-6 bg-gray-200 h-screen p-6 rounded-lg shadow-md">
                 {/* Profile Section */}
-                <div className="bg-white p-6 rounded-lg shadow w-full md:w-2/3">
+                <div className="bg-white h-[65vh] p-6 rounded-lg shadow w-full md:w-2/3">
                     <h2 className="text-xl font-semibold mb-4">Your Profile</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -141,7 +138,7 @@ const Myaccount = () => {
                 </div>
 
                 {/* Security Section */}
-                <div className="bg-white p-6 rounded-lg shadow w-full md:w-1/3">
+                <div className="bg-white p-6 h-[65vh] rounded-lg shadow w-full md:w-1/3">
                     <h2 className="text-xl font-semibold mb-4">Security</h2>
 
                     <div className="flex items-center mb-4">

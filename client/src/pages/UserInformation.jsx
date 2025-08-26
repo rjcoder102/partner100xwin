@@ -16,9 +16,6 @@ const UserInformation = () => {
 
     return (
         <div className="min-h-screen">
-            {/* Header */}
-            <DashboardHeader />
-
             {/* Main Content */}
             <div className="container mx-auto max-w-6xl pt-6">
                 {/* Tabs */}

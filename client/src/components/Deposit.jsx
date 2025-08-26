@@ -1,142 +1,26 @@
-import React, { useMemo, useState } from 'react';
-import DashboardHeader from './DashboardHeader';
-import { FiCopy, FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { FiCopy } from 'react-icons/fi';
+import { getDownlineDeposits } from '../Redux/reducer/withdrawlSlicer';
 
 const Deposit = () => {
-    // Enhanced sample data with more realistic entries
-    const initialDeposits = [
-        {
-            id: "DPT-982341",
-            user: {
-                name: "Aman Sharma",
-                email: "aman@example.com",
-                avatar: "https://randomuser.me/api/portraits/men/32.jpg"
-            },
-            method: {
-                name: "UPI",
-                icon: "💸",
-                color: "bg-purple-100 text-purple-800"
-            },
-            amount: 12500,
-            currency: "INR",
-            fee: 10,
-            status: "Completed",
-            createdAt: new Date().toISOString().slice(0, 16).replace("T", " "),
-        },
-        {
-            id: "DPT-982345",
-            user: {
-                name: "Priya Patel",
-                email: "priya@example.com",
-                avatar: "https://randomuser.me/api/portraits/women/44.jpg"
-            },
-            method: {
-                name: "Paytm Wallet",
-                icon: "📱",
-                color: "bg-blue-100 text-blue-800"
-            },
-            amount: 8500,
-            currency: "INR",
-            fee: 0,
-            status: "Completed",
-            createdAt: new Date(Date.now() - 86400000).toISOString().slice(0, 16).replace("T", " "), // Yesterday
-        },
-        {
-            id: "DPT-982342",
-            user: {
-                name: "Rahul Verma",
-                email: "rahul@example.com",
-                avatar: "https://randomuser.me/api/portraits/men/67.jpg"
-            },
-            method: {
-                name: "Bank Transfer",
-                icon: "🏦",
-                color: "bg-green-100 text-green-800"
-            },
-            amount: 25000,
-            currency: "INR",
-            fee: 0,
-            status: "Pending",
-            createdAt: new Date(Date.now() - 172800000).toISOString().slice(0, 16).replace("T", " "), // 2 days ago
-        },
-        {
-            id: "DPT-982343",
-            user: {
-                name: "Neha Gupta",
-                email: "neha@example.com",
-                avatar: "https://randomuser.me/api/portraits/women/63.jpg"
-            },
-            method: {
-                name: "Credit Card",
-                icon: "💳",
-                color: "bg-yellow-100 text-yellow-800"
-            },
-            amount: 7499,
-            currency: "INR",
-            fee: 75,
-            status: "Failed",
-            createdAt: new Date(Date.now() - 259200000).toISOString().slice(0, 16).replace("T", " "), // 3 days ago
-        },
-        {
-            id: "DPT-982344",
-            user: {
-                name: "Vikram Singh",
-                email: "vikram@example.com",
-                avatar: "https://randomuser.me/api/portraits/men/71.jpg"
-            },
-            method: {
-                name: "Google Pay",
-                icon: "📲",
-                color: "bg-teal-100 text-teal-800"
-            },
-            amount: 5600,
-            currency: "INR",
-            fee: 0,
-            status: "Completed",
-            createdAt: new Date(Date.now() - 345600000).toISOString().slice(0, 16).replace("T", " "), // 4 days ago
-        },
-        {
-            id: "DPT-982346",
-            user: {
-                name: "Ananya Joshi",
-                email: "ananya@example.com",
-                avatar: "https://randomuser.me/api/portraits/women/33.jpg"
-            },
-            method: {
-                name: "PhonePe",
-                icon: "📱",
-                color: "bg-indigo-100 text-indigo-800"
-            },
-            amount: 3200,
-            currency: "INR",
-            fee: 0,
-            status: "Completed",
-            createdAt: new Date(Date.now() - 432000000).toISOString().slice(0, 16).replace("T", " "), // 5 days ago
-        },
-        {
-            id: "DPT-982347",
-            user: {
-                name: "Rohan Malhotra",
-                email: "rohan@example.com",
-                avatar: "https://randomuser.me/api/portraits/men/45.jpg"
-            },
-            method: {
-                name: "Net Banking",
-                icon: "💻",
-                color: "bg-orange-100 text-orange-800"
-            },
-            amount: 15000,
-            currency: "INR",
-            fee: 0,
-            status: "Pending",
-            createdAt: new Date(Date.now() - 518400000).toISOString().slice(0, 16).replace("T", " "), // 6 days ago
-        }
-    ];
+    const dispatch = useDispatch();
+    const deposits = useSelector(state => state.deposits);
+    const { downlineDeposits } = useSelector(state => state.withrawal);
+    console.log("response data main", downlineDeposits);
+
+    const [filter, setFilter] = useState("month");
+    const [dateFilter, setDateFilter] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
     const statusStyles = {
         Completed: { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
         Pending: { bg: "bg-yellow-100", text: "text-yellow-800", dot: "bg-yellow-500" },
         Failed: { bg: "bg-red-100", text: "text-red-800", dot: "bg-red-500" },
+        "1": { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
+        "0": { bg: "bg-yellow-100", text: "text-yellow-800", dot: "bg-yellow-500" },
+        "2": { bg: "bg-red-100", text: "text-red-800", dot: "bg-red-500" },
     };
 
     function currency(amount, code = "INR") {
@@ -151,41 +35,35 @@ const Deposit = () => {
         }
     }
 
-    const [filter, setFilter] = useState("month"); // day, week, month
-    const [dateFilter, setDateFilter] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    // Fetch data when filters change
+    useEffect(() => {
+        const filters = {};
 
-    // Filtering Logic
-    const filteredDeposits = useMemo(() => {
-        let data = [...initialDeposits];
-        const today = new Date();
-
-        if (filter === "day") {
-            data = data.filter(
-                (d) => new Date(d.createdAt).toDateString() === today.toDateString()
-            );
-        } else if (filter === "week") {
-            const weekAgo = new Date();
-            weekAgo.setDate(today.getDate() - 7);
-            data = data.filter(
-                (d) => new Date(d.createdAt) >= weekAgo && new Date(d.createdAt) <= today
-            );
-        } else if (filter === "month") {
-            const monthAgo = new Date();
-            monthAgo.setMonth(today.getMonth() - 1);
-            data = data.filter(
-                (d) => new Date(d.createdAt) >= monthAgo && new Date(d.createdAt) <= today
-            );
+        if (filter) filters.filter = filter;
+        if (dateFilter) {
+            filters.startDate = dateFilter;
+            filters.endDate = dateFilter;
         }
+
+        dispatch(getDownlineDeposits(filters));
+    }, [dispatch, filter, dateFilter]);
+
+
+    // Filtering Logic for client-side (if needed)
+    const filteredDeposits = useMemo(() => {
+        if (!deposits?.data || deposits.data.length === 0) return [];
+
+        let data = [...deposits.data];
 
         if (dateFilter) {
-            data = data.filter((d) => d.createdAt.slice(0, 10) === dateFilter);
+            data = data.filter((d) => {
+                const depositDate = new Date(d.updated_at || d.createdAt).toISOString().slice(0, 10);
+                return depositDate === dateFilter;
+            });
         }
 
-        // Sort by newest first
-        return data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    }, [filter, dateFilter]);
+        return data.sort((a, b) => new Date(b.updated_at || b.createdAt) - new Date(a.updated_at || a.createdAt));
+    }, [deposits?.data, dateFilter]);
 
     // Pagination Logic
     const totalPages = Math.ceil(filteredDeposits.length / itemsPerPage);
@@ -198,13 +76,13 @@ const Deposit = () => {
     const summary = useMemo(() => {
         const totalDeposits = filteredDeposits.length;
         const totalAmount = filteredDeposits.reduce(
-            (sum, d) => sum + d.amount,
+            (sum, d) => sum + (d.amount || 0),
             0
         );
         const successful = filteredDeposits.filter(
-            (d) => d.status === "Completed"
+            (d) => d.status === "Completed" || d.status === 1
         ).length;
-        const uniqueUsers = new Set(filteredDeposits.map(d => d.user.name)).size;
+        const uniqueUsers = new Set(filteredDeposits.map(d => d.user?.name || d.user_id || d.id)).size;
 
         return { totalDeposits, totalAmount, successful, uniqueUsers };
     }, [filteredDeposits]);
@@ -213,13 +91,45 @@ const Deposit = () => {
         navigator.clipboard?.writeText(text);
     };
 
-    return (
-        <div className="min-h-screen bg-gray-100">
-            <DashboardHeader />
+    const getStatusText = (status) => {
+        const statusMap = {
+            "1": "Completed",
+            "0": "Pending",
+            "2": "Failed",
+            "Completed": "Completed",
+            "Pending": "Pending",
+            "Failed": "Failed"
+        };
+        return statusMap[status] || status;
+    };
 
-            <div className="max-w-6xl mx-auto md:pt-6 sm:p-6">
+    const formatDate = (dateString) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return {
+            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        };
+    };
+
+    return (
+        <div className="min-h-screen ">
+            <div className="max-w-6xl mx-auto md:pt-6">
+                {/* Loading and Error States */}
+                {/* {deposits.loading && (
+                    <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded">
+                        <p>Loading deposit data...</p>
+                    </div>
+                )}
+
+                {deposits.error && (
+                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+                        <p>Error: {deposits.error}</p>
+                    </div>
+                )} */}
+
                 {/* Summary Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     <div className="bg-white shadow rounded-xl p-4 border-l-4 border-blue-500">
                         <p className="text-gray-500 text-sm font-medium">Total Deposits</p>
                         <p className="text-2xl font-bold text-gray-800">
@@ -249,7 +159,7 @@ const Deposit = () => {
                                 : "No data"}
                         </p>
                     </div>
-                    <div className="bg-white shadow rounded-xl p-4 border-l-4 border-orange-500">
+                    {/* <div className="bg-white shadow rounded-xl p-4 border-l-4 border-orange-500">
                         <p className="text-gray-500 text-sm font-medium">
                             Unique Users
                         </p>
@@ -261,7 +171,7 @@ const Deposit = () => {
                                 ? `Avg ${(filteredDeposits.length / summary.uniqueUsers).toFixed(1)} deposits per user`
                                 : "No data"}
                         </p>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Filters */}
@@ -274,11 +184,12 @@ const Deposit = () => {
                                     key={type}
                                     onClick={() => {
                                         setFilter(type);
+                                        setDateFilter("");
                                         setCurrentPage(1);
                                     }}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === type
-                                            ? "bg-blue-600 text-white shadow-md"
-                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                        ? "bg-blue-600 text-white shadow-md"
+                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                         }`}
                                 >
                                     {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -296,10 +207,22 @@ const Deposit = () => {
                                 value={dateFilter}
                                 onChange={(e) => {
                                     setDateFilter(e.target.value);
+                                    setFilter("");
                                     setCurrentPage(1);
                                 }}
                                 className="border border-gray-300 px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             />
+                            {dateFilter && (
+                                <button
+                                    onClick={() => {
+                                        setDateFilter("");
+                                        setCurrentPage(1);
+                                    }}
+                                    className="px-3 py-2 text-sm text-red-600 hover:text-red-800"
+                                >
+                                    Clear
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -319,84 +242,85 @@ const Deposit = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {paginatedDeposits.length > 0 ? (
-                                    paginatedDeposits.map((d) => (
-                                        <tr
-                                            key={d.id}
-                                            className="hover:bg-gray-50 transition-colors"
-                                        >
-                                            <td className="p-4">
-                                                <div className="flex items-center">
-                                                    <button
-                                                        onClick={() => copyToClipboard(d.id)}
-                                                        className="mr-2 text-gray-400 hover:text-blue-500 transition-colors"
-                                                        title="Copy Transaction ID"
-                                                    >
-                                                        <FiCopy className="w-4 h-4" />
-                                                    </button>
-                                                    <span className="text-sm font-medium text-gray-700">
-                                                        {d.id}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="flex items-center">
-                                                    <img
-                                                        src={d.user.avatar}
-                                                        alt={d.user.name}
-                                                        className="w-8 h-8 rounded-full mr-3"
-                                                    />
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-900">{d.user.name}</p>
-                                                        <p className="text-xs text-gray-500">{d.user.email}</p>
+                                {downlineDeposits.data.length > 0 ? (
+                                    downlineDeposits.data.map((d) => {
+                                        const statusText = getStatusText(d.status);
+                                        const formattedDate = formatDate(d.updated_at || d.createdAt);
+                                        return (
+                                            <tr
+                                                key={d.id || d._id}
+                                                className="hover:bg-gray-50 transition-colors"
+                                            >
+                                                <td className="p-4">
+                                                    <div className="flex items-center">
+                                                        <button
+                                                            onClick={() => copyToClipboard(d.id || d.transaction_id)}
+                                                            className="mr-2 text-gray-400 hover:text-blue-500 transition-colors"
+                                                            title="Copy Transaction ID"
+                                                        >
+                                                            <FiCopy className="w-4 h-4" />
+                                                        </button>
+                                                        <span className="text-sm font-medium text-gray-700">
+                                                            {d.id || d.transaction_id || 'N/A'}
+                                                        </span>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="p-4">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${d.method.color}`}>
-                                                    <span className="mr-1">{d.method.icon}</span>
-                                                    {d.method.name}
-                                                </span>
-                                            </td>
-                                            <td className="p-4">
-                                                <p className="text-sm font-semibold text-gray-900">
-                                                    {currency(d.amount, d.currency)}
-                                                </p>
-                                                {d.fee > 0 && (
-                                                    <p className="text-xs text-gray-500">
-                                                        Fee: {currency(d.fee, d.currency)}
+                                                </td>
+                                                <td className="p-4">
+                                                    <div className="flex items-center">
+                                                        <div className="w-8 h-8 bg-gray-300 rounded-full mr-3 flex items-center justify-center">
+                                                            <span className="text-sm font-medium text-gray-600">
+                                                                {/* {(d.user?.name || d.user_id || 'U').charAt(0).toUpperCase()} */}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-medium text-gray-900">
+                                                                {/* {d.user?.name || d.user_id || 'Unknown User'} */}
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                {/* {d.user?.email || d.email || 'No email'} */}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="p-4">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800`}>
+                                                        {d.method?.name || 'Bank Transfer'}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4">
+                                                    <p className="text-sm font-semibold text-gray-900">
+                                                        {currency(d.amount, d.currency)}
                                                     </p>
-                                                )}
-                                            </td>
-                                            <td className="p-4">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[d.status].bg} ${statusStyles[d.status].text}`}>
-                                                    <span className={`w-2 h-2 rounded-full ${statusStyles[d.status].dot} mr-1.5`}></span>
-                                                    {d.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-4">
-                                                <p className="text-sm text-gray-900">
-                                                    {new Date(d.createdAt).toLocaleDateString('en-US', {
-                                                        month: 'short',
-                                                        day: 'numeric'
-                                                    })}
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {new Date(d.createdAt).toLocaleTimeString('en-US', {
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                    })}
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    ))
+                                                    {d.fee > 0 && (
+                                                        <p className="text-xs text-gray-500">
+                                                            Fee: {currency(d.fee, d.currency)}
+                                                        </p>
+                                                    )}
+                                                </td>
+                                                <td className="p-4">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[statusText]?.bg || 'bg-gray-100'} ${statusStyles[statusText]?.text || 'text-gray-800'}`}>
+                                                        <span className={`w-2 h-2 rounded-full ${statusStyles[statusText]?.dot || 'bg-gray-500'} mr-1.5`}></span>
+                                                        {statusText}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4">
+                                                    <p className="text-sm text-gray-900">
+                                                        {formattedDate.date}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {formattedDate.time}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
                                 ) : (
                                     <tr>
                                         <td
                                             className="p-4 text-center text-gray-500 text-sm"
                                             colSpan="6"
                                         >
-                                            No deposit records found
+                                            {/* {deposits.loading ? 'Loading...' : 'No deposit records found'} */}
                                         </td>
                                     </tr>
                                 )}
@@ -424,8 +348,8 @@ const Deposit = () => {
                                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                                     disabled={currentPage === 1}
                                     className={`px-3 py-1 rounded-md text-sm ${currentPage === 1
-                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                         }`}
                                 >
                                     Previous
@@ -436,8 +360,8 @@ const Deposit = () => {
                                             key={page}
                                             onClick={() => setCurrentPage(page)}
                                             className={`px-3 py-1 rounded-md text-sm ${currentPage === page
-                                                    ? "bg-blue-600 text-white"
-                                                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                                ? "bg-blue-600 text-white"
+                                                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                                 }`}
                                         >
                                             {page}
@@ -450,8 +374,8 @@ const Deposit = () => {
                                     }
                                     disabled={currentPage === totalPages}
                                     className={`px-3 py-1 rounded-md text-sm ${currentPage === totalPages
-                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                         }`}
                                 >
                                     Next

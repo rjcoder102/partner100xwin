@@ -1,115 +1,66 @@
-import React, { useState } from "react";
-import DashboardPage from "../components/DashboardPage";
-import {
-    FaChartBar, FaLink, FaGift, FaBook, FaTrophy, FaCrown,
-    FaTelegramPlane, FaHeadset, FaUsers, FaUserFriends
-} from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { Outlet, useLocation, useParams, Link } from "react-router-dom";
+import { FaChartBar, FaLink, FaGift, FaBook } from "react-icons/fa";
 import { MdWindow } from "react-icons/md";
-import LinksPage from "../components/LinksPage";
-import Deposit from "../components/Deposit";
-import Withdrawl from "./Withdrawl";
-import DownlineUser from "../components/DownlineUser";
-import SelfWithdrawl from "./SelfWithdrawl";
-import UserInformation from "./UserInformation";
-import { IoPersonSharp } from "react-icons/io5";
 
 const Dashboard = () => {
-    const [activePage, setActivePage] = useState("Dashboard");
+    const location = useLocation();
+    const { en } = useParams();
 
+    // ✅ Active state
+    const [active, setActive] = useState("Dashboard");
 
+    // ✅ Update active state whenever URL changes
+    useEffect(() => {
+        setActive(location.pathname);
+    }, [location.pathname]);
 
-    // Sidebar items with icons
     const menuItems = [
-        { label: "Dashboard", icon: <MdWindow /> },
-        { label: "User", icon: <IoPersonSharp /> },
-        { label: "Links", icon: <FaLink /> },
-        { label: "Deposit", icon: <FaChartBar /> },
-        { label: "Withdrawl", icon: <FaGift /> },
-        { label: "Downline User", icon: <FaBook /> },
-        { label: "SelfWithdrawl", icon: <FaBook /> },
-        { label: "TOP10 Partners", icon: <FaCrown /> },
-        { label: "Telegram bot", icon: <FaTelegramPlane /> },
-        { label: "Support", icon: <FaHeadset /> },
-        { label: "Affiliate programs", icon: <FaUsers /> },
-        { label: "Sub-Affiliate", icon: <FaUserFriends /> },
+        { label: "Dashboard", icon: <MdWindow />, link: "/dasboardpage" },
+        { label: "Links", icon: <FaLink />, link: "/linkpages" },
+        { label: "Deposit", icon: <FaChartBar />, link: "/deposit" },
+        { label: "Withdrawl", icon: <FaGift />, link: "/withdrawl" },
+        { label: "Downline User", icon: <FaBook />, link: "/downlineuser" },
+        // { label: "SelfWithdrawl", icon: <FaBook />, link: "/selfwithdrawl" },
     ];
 
-    // Different content for each page
-    const renderContent = () => {
-        switch (activePage) {
-            case "Dashboard":
-                return <DashboardPage />;
-            case "Deposit":
-                return (
-                    <Deposit />
-                );
-            case "Links":
-                return (
-                    <LinksPage />
-                );
-            case "Withdrawl":
-                return (
-                    <Withdrawl />
-                );
-            case "Downline User":
-                return (
-                    <DownlineUser />
-                );
-            case "SelfWithdrawl":
-                return (
-                    <SelfWithdrawl />
-                );
-
-            case "User":
-                return (
-                    <UserInformation />
-                );
-
-            default:
-                return (
-                    <div className="bg-white p-6 rounded-lg shadow">
-                        <h2 className="text-xl font-bold mb-4">{activePage}</h2>
-                        <p>Content for {activePage} goes here.</p>
-                    </div>
-                );
-        }
-    };
-
     return (
-        <div className="min-h-screen flex ">
-            {/* Sidebar */}
-            <div className="fixed left-0 top-0 h-full w-72 bg-[#1b1b28] shadow-md sm:hidden md:block">
-                <div className="py-3.5 bg-[#0D0F21] flex items-center justify-center ">
+        <div className="min-h-screen flex">
+            {/* ✅ Sidebar */}
+            <div className="fixed left-0 top-0 h-full w-[20%] bg-[#1b1b28]  hidden md:block">
+                <div className="py-3.5 bg-[#0D0F21] flex items-center justify-center">
                     <img
                         className="h-10"
                         src="https://quotex-partner.com/affiliate_site/images/landing/header-logo.svg"
                         alt="logo"
                     />
-                </div>  
+                </div>
 
                 <nav className="pt-7">
                     <ul className="space-y-2">
                         {menuItems.map((item) => (
                             <li key={item.label}>
-                                <button
-                                    onClick={() => setActivePage(item.label)}
-                                    className={`flex items-center gap-3 w-full text-left px-4 py-2 transition 
-                                        ${activePage === item.label
+                                <Link
+                                    to={item.link}
+                                    onClick={() => setActive(item.link)} // ✅ Click se setActive
+                                    className={`flex items-center w-full gap-3 text-left px-4 py-2 transition ${active === item.link
                                             ? "bg-[#0D0F21] text-white"
-                                            : "text-gray-400 hover:bg-[#2a2a3d]"}`
-                                    }
+                                            : "text-gray-400 hover:bg-[#2a2a3d]"
+                                        }`}
                                 >
                                     <span className="text-lg">{item.icon}</span>
                                     <span>{item.label}</span>
-                                </button>
+                                </Link>
                             </li>
                         ))}
                     </ul>
                 </nav>
             </div>
 
-            {/* Main Content */}
-            <div className="ml-72 w-full bg-gray-200 ">{renderContent()}</div>
+            {/* ✅ Page Content */}
+            <div className="lg:ml-[20%] sm:ml-0 flex-1 bg-gray-200 p-4">
+                <Outlet />
+            </div>
         </div>
     );
 };

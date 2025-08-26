@@ -10,8 +10,12 @@ import OtpPage from "./pages/OtpPage";
 import UserInformation from "./pages/UserInformation";
 import Myaccount from "./pages/Myaccount";
 import SelfWithdrawl from "./pages/SelfWithdrawl";
-
-
+import Deposit from "./components/Deposit";
+import DashboardPage from "./components/DashboardPage";
+import Withdrawl from "./pages/Withdrawl";
+import DownlineUser from "./components/DownlineUser";
+import Layout from "./layout/Layout";
+import LinksPage from "./pages/LinksPage";
 
 function App() {
   return (
@@ -24,13 +28,18 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/otpcode" element={<OtpPage />} />
 
-        {/* Protected routes */}
+        {/* Wrap Layout inside PrivateRoute if needed */}
         <Route element={<PrivateRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/userinformation" element={<UserInformation />} />
-          <Route path="/myaccount" element={<Myaccount />} />
-          <Route path="/selfwithdrawl" element={<SelfWithdrawl />} />
-          <Route path="/userInformation" element={<UserInformation/>} />
+          <Route path="" element={<Layout />}>
+            <Route path="userinformation" element={<UserInformation />} />
+            <Route path="myaccount" element={<Myaccount />} />
+            <Route path="selfwithdrawl" element={<SelfWithdrawl />} />
+            <Route path="deposit" element={<Deposit />} />
+            <Route path="dasboardpage" element={<DashboardPage />} />
+            <Route path="withdrawl" element={<Withdrawl />} />
+            <Route path="downlineuser" element={<DownlineUser />} />
+            <Route path="linkpages" element={<LinksPage />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

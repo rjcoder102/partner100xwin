@@ -42,7 +42,7 @@ const Register = () => {
                         autoClose: 2000,
                         theme: "colored",
                     });
-                    navigate("/dashboard");
+                    navigate("/dasboardpage");
                 }
             })
             .catch((err) => {

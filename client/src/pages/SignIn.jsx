@@ -25,7 +25,7 @@ const SignIn = () => {
     useEffect(() => {
         if (userInfo) {
             // navigate("/otpcode", { state: { email: user.email } });
-            navigate("/dashboard", { state: { email: userInfo.email } });
+            navigate("/dasboardpage", { state: { email: userInfo.email } });
         }
     }, [userInfo, navigate]);
 

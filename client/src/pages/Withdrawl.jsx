@@ -1,89 +1,37 @@
-import React, { useState, useMemo } from "react";
-import DashboardHeader from "../components/DashboardHeader";
+import React, { useState, useMemo, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getDownlineWithdrawals } from "../Redux/reducer/withdrawlSlicer";
 
 const Withdrawl = () => {
-    // Sample Withdrawal Data
-    const initialWithdrawals = [
-        {
-            id: "WD-982341",
-            user: "Aman Sharma",
-            date: "2025-08-01",
-            amount: 5000,
-            status: "Success",
-        },
-        {
-            id: "WD-982342",
-            user: "Kundan Kumar",
-            date: "2025-08-12",
-            amount: 3000,
-            status: "Pending",
-        },
-        {
-            id: "WD-982343",
-            user: "Rahul Verma",
-            date: "2025-08-15",
-            amount: 7000,
-            status: "Success",
-        },
-        {
-            id: "WD-982344",
-            user: "Neha Gupta",
-            date: "2025-07-28",
-            amount: 2000,
-            status: "Failed",
-        },
-        {
-            id: "WD-982345",
-            user: "Priya Singh",
-            date: "2025-08-05",
-            amount: 4500,
-            status: "Success",
-        },
-        {
-            id: "WD-982346",
-            user: "Vikram Patel",
-            date: "2025-08-18",
-            amount: 6000,
-            status: "Pending",
-        },
-        {
-            id: "WD-982347",
-            user: "Anjali Mehta",
-            date: "2025-08-10",
-            amount: 3200,
-            status: "Success",
-        },
-        {
-            id: "WD-982348",
-            user: "Rohan Desai",
-            date: "2025-08-03",
-            amount: 2800,
-            status: "Failed",
-        },
-        {
-            id: "WD-982349",
-            user: "Sneha Reddy",
-            date: "2025-08-14",
-            amount: 5100,
-            status: "Success",
-        },
-        {
-            id: "WD-982350",
-            user: "Arjun Khanna",
-            date: "2025-08-16",
-            amount: 4200,
-            status: "Pending",
-        },
-    ];
+    const dispatch = useDispatch();
 
-    const [filter, setFilter] = useState("month"); // day, week, month
+    // ✅ Get withdrawals state from Redux
+    const  withdrawals  = useSelector((state) => state.withdrawal);
+    console.log("Withdrawals data: ", withdrawals);
+
+    // Local UI states
+    const [filter, setFilter] = useState("month"); // day | week | month
     const [dateFilter, setDateFilter] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
-    // Filtering Logic
+    // ✅ Fetch data when filters change
+    useEffect(() => {
+        const filters = {};
+        if (filter) filters.filter = filter;
+        if (startDate) filters.startDate = startDate;
+        if (endDate) filters.endDate = endDate;
+
+        dispatch(getDownlineWithdrawals(filters));
+    }, [dispatch, filter, startDate, endDate]);
+
+    // ✅ Filtering logic
     const filteredWithdrawals = useMemo(() => {
-        let data = [...initialWithdrawals];
+        if (!withdrawals) return [];
+
+        let data = [...withdrawals];
         const today = new Date();
 
         if (filter === "day") {
@@ -109,44 +57,56 @@ const Withdrawl = () => {
         }
 
         return data;
-    }, [filter, dateFilter]);
+    }, [withdrawals, filter, dateFilter]);
 
-    // Pagination Logic
+    // ✅ Pagination
     const totalPages = Math.ceil(filteredWithdrawals.length / itemsPerPage);
     const paginatedWithdrawals = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         return filteredWithdrawals.slice(startIndex, startIndex + itemsPerPage);
     }, [filteredWithdrawals, currentPage]);
 
-    // Summary Stats
+    // ✅ Summary cards
     const summary = useMemo(() => {
         const totalWithdrawals = filteredWithdrawals.length;
         const totalAmount = filteredWithdrawals.reduce(
-            (sum, w) => sum + w.amount,
+            (sum, w) => sum + (w.amount || 0),
             0
         );
         const successful = filteredWithdrawals.filter(
             (w) => w.status === "Success"
         ).length;
-        
-        // Calculate unique users
-        const uniqueUsers = new Set(filteredWithdrawals.map(w => w.user)).size;
+
+        const uniqueUsers = new Set(filteredWithdrawals.map((w) => w.user)).size;
 
         return { totalWithdrawals, totalAmount, successful, uniqueUsers };
     }, [filteredWithdrawals]);
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <DashboardHeader />
+    // ✅ Show loading / error
+    // if (loading) {
+    //     return (
+    //         <div className="min-h-screen flex items-center justify-center text-xl text-gray-600">
+    //             Loading withdrawal data...
+    //         </div>
+    //     );
+    // }
 
-            <div className="max-w-6xl mx-auto md:pt-6 sm:p-6">
-                {/* Summary Cards - Updated to 4 columns */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    // if (error) {
+    //     return (
+    //         <div className="min-h-screen flex items-center justify-center text-xl text-red-600">
+    //             Error: {error.message || "Failed to load withdrawal data"}
+    //         </div>
+    //     );
+    // }
+
+    return (
+        <div className="min-h-screen">
+            <div className="max-w-6xl mx-auto md:pt-6">
+                {/* ✅ Summary Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     <div className="bg-white shadow-md rounded-lg p-5 border-l-4 border-blue-500">
                         <p className="text-gray-500 text-sm font-medium">Total Withdrawals</p>
-                        <p className="text-2xl font-bold text-gray-800">
-                            {summary.totalWithdrawals}
-                        </p>
+                        <p className="text-2xl font-bold text-gray-800">{summary.totalWithdrawals}</p>
                         <p className="text-xs text-gray-400 mt-1">All time records</p>
                     </div>
                     <div className="bg-white shadow-md rounded-lg p-5 border-l-4 border-green-500">
@@ -157,12 +117,8 @@ const Withdrawl = () => {
                         <p className="text-xs text-gray-400 mt-1">Current period</p>
                     </div>
                     <div className="bg-white shadow-md rounded-lg p-5 border-l-4 border-purple-500">
-                        <p className="text-gray-500 text-sm font-medium">
-                            Successful Withdrawals
-                        </p>
-                        <p className="text-2xl font-bold text-gray-800">
-                            {summary.successful}
-                        </p>
+                        <p className="text-gray-500 text-sm font-medium">Successful Withdrawals</p>
+                        <p className="text-2xl font-bold text-gray-800">{summary.successful}</p>
                         <p className="text-xs text-gray-400 mt-1">
                             {filteredWithdrawals.length > 0
                                 ? `${Math.round(
@@ -171,26 +127,11 @@ const Withdrawl = () => {
                                 : "No data"}
                         </p>
                     </div>
-                    {/* New Unique Users Card */}
-                    <div className="bg-white shadow-md rounded-lg p-5 border-l-4 border-orange-500">
-                        <p className="text-gray-500 text-sm font-medium">
-                            Unique Users
-                        </p>
-                        <p className="text-2xl font-bold text-gray-800">
-                            {summary.uniqueUsers}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                            {filteredWithdrawals.length > 0
-                                ? `Avg ${(filteredWithdrawals.length / summary.uniqueUsers).toFixed(1)} withdrawals per user`
-                                : "No data"}
-                        </p>
-                    </div>
                 </div>
 
-                {/* Filters */}
+                {/* ✅ Filters */}
                 <div className="bg-white shadow-md rounded-lg p-4 mb-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        {/* Time Period Buttons */}
                         <div className="flex flex-wrap gap-2">
                             {["day", "week", "month"].map((type) => (
                                 <button
@@ -210,9 +151,8 @@ const Withdrawl = () => {
                             ))}
                         </div>
 
-                        {/* Date Filter */}
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-600 font-medium">
+                            <span className="text-sm text-gray-600 font-medium whitespace-nowrap">
                                 Specific Date:
                             </span>
                             <input
@@ -228,7 +168,7 @@ const Withdrawl = () => {
                     </div>
                 </div>
 
-                {/* Withdrawal Table */}
+                {/* ✅ Withdrawal Table */}
                 <div className="bg-white shadow-md rounded-xl overflow-hidden mb-8">
                     <div className="overflow-x-auto">
                         <table className="w-full">
@@ -248,9 +188,7 @@ const Withdrawl = () => {
                                             key={w.id}
                                             className="hover:bg-gray-50 transition-colors"
                                         >
-                                            <td className="p-4 text-sm font-medium text-gray-700">
-                                                {w.id}
-                                            </td>
+                                            <td className="p-4 text-sm font-medium text-gray-700">{w.id}</td>
                                             <td className="p-4 text-sm text-gray-600">{w.user}</td>
                                             <td className="p-4 text-sm text-gray-600">{w.date}</td>
                                             <td className="p-4 text-sm font-medium text-gray-700">
@@ -262,8 +200,8 @@ const Withdrawl = () => {
                                                         w.status === "Success"
                                                             ? "bg-green-100 text-green-800"
                                                             : w.status === "Pending"
-                                                                ? "bg-yellow-100 text-yellow-800"
-                                                                : "bg-red-100 text-red-800"
+                                                            ? "bg-yellow-100 text-yellow-800"
+                                                            : "bg-red-100 text-red-800"
                                                     }`}
                                                 >
                                                     {w.status}
@@ -285,7 +223,7 @@ const Withdrawl = () => {
                         </table>
                     </div>
 
-                    {/* Pagination */}
+                    {/* ✅ Pagination */}
                     {filteredWithdrawals.length > 0 && (
                         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
                             <div className="text-sm text-gray-500">
@@ -312,21 +250,19 @@ const Withdrawl = () => {
                                 >
                                     Previous
                                 </button>
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                                    (page) => (
-                                        <button
-                                            key={page}
-                                            onClick={() => setCurrentPage(page)}
-                                            className={`px-3 py-1 rounded-md text-sm ${
-                                                currentPage === page
-                                                    ? "bg-blue-600 text-white"
-                                                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                            }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    )
-                                )}
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                    <button
+                                        key={page}
+                                        onClick={() => setCurrentPage(page)}
+                                        className={`px-3 py-1 rounded-md text-sm ${
+                                            currentPage === page
+                                                ? "bg-blue-600 text-white"
+                                                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                        }`}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
                                 <button
                                     onClick={() =>
                                         setCurrentPage((prev) => Math.min(prev + 1, totalPages))

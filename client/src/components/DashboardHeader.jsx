@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, logoutUser } from "../Redux/reducer/authSlice";
 // import { getUserProfile, logoutUser } from "../Redux/reducer/authSlice";
+import { motion, AnimatePresence } from "framer-motion";
 
 
 const languages = [
@@ -27,6 +28,7 @@ const DashboardHeader = () => {
     const [showLevelsDropdown, setShowLevelsDropdown] = useState(false);
     const [showAccountDropdown, setShowAccountDropdown] = useState(false);
     const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate()
@@ -77,9 +79,59 @@ const DashboardHeader = () => {
 
     return (
         <div className=''>
+            {/* phone device */}
+            <div className="flex items-center justify-between px-2 md:hidden sm:block">
+                <div>
+                    <img src="https://quotex-partner.com/partners/media/logos/logo-light.png" alt="" />
+                </div>
+                {/* Toggle Button */}
+                <div>
+                    <button
+                        onClick={() => setOpen(!open)}
+                        className=" flex flex-col justify-center items-end space-y-1.5 z-50 group"
+                    >
+                        <span className="block w-3 h-0.5 bg-white rounded transition-all duration-300 group-hover:w-6"></span>
+                        <span className="block w-6 h-0.5 bg-white rounded transition-all duration-300 group-hover:w-8"></span>
+                        <span className="block w-5 h-0.5 bg-white rounded transition-all duration-300 group-hover:w-7"></span>
+                    </button>
+
+                </div>
+                {/* Sidebar */}
+                <AnimatePresence>
+                    {open && (
+                        <>
+                            {/* Overlay (click to close) */}
+                            <motion.div
+                                className="fixed inset-0 bg-[#0D0F21]/50 z-40"
+                                onClick={() => setOpen(false)}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                            />
+
+                            {/* Sliding Menu */}
+                            <motion.div
+                                className="fixed top-0 left-0 h-full w-64 bg-[#1A1B27] shadow-lg z-50 p-6"
+                                initial={{ x: "-100%" }}
+                                animate={{ x: 0 }}
+                                exit={{ x: "-100%" }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <h2 className="text-xl font-bold mb-6">Menu</h2>
+                                <ul className="space-y-4">
+                                    <li className="hover:text-blue-400 cursor-pointer">🏠 Home</li>
+                                    <li className="hover:text-blue-400 cursor-pointer">📁 Files</li>
+                                    <li className="hover:text-blue-400 cursor-pointer">⚙️ Settings</li>
+                                    {/* <li onClick={() => setOpen(false)} className="hover:text-blue-400 cursor-pointer">❌ Close</li> */}
+                                </ul>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
+            </div>
             {/* Header */}
             <div className="bg-white shadow-sm px-6 py-2 ">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-row md:flex-row md:items-center md:justify-between">
                     {/* Balance Section */}
                     <div className="mb-4 md:mb-0">
                         <div className='flex items-center space-x-3 mb-1'>
@@ -98,13 +150,8 @@ const DashboardHeader = () => {
                     </div>
 
                     {/* Right Side Controls */}
-                    <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4 sm:items-center">
-                        <a
-                            // href="https://t.me/quotex_partner"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-blue-500 hover:text-blue-600 font-medium cursor-pointer"
-                        >
+                    <div className="flex space-y-3 md:flex-row sm:space-y-0 sm:space-x-4 sm:items-center">
+                        <a className="flex flex-row items-center gap-2 text-blue-500 hover:text-blue-600 font-medium cursor-pointer sm:hidden md:block">
                             <div className="w-6 h-6">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +169,7 @@ const DashboardHeader = () => {
                             <span>@100xwins_partner</span>
                         </a>
                         {/* Language Dropdown */}
-                        <div className="relative">
+                        <div className="relative ">
                             <button
                                 className="flex items-center gap-2 px-3 py-2 text-gray-800 rounded transition-colors"
                                 onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
@@ -264,7 +311,7 @@ const DashboardHeader = () => {
                             {showAccountDropdown && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-20 border border-gray-100 py-1">
                                     <Link
-                                        to="/myaccount?redirect=true"
+                                        to="/myaccount"
                                         className="block px-4 py-2 text-gray-700 hover:bg-gray-50"
                                         onClick={() => setShowAccountDropdown(false)}
                                     >

@@ -1,37 +1,48 @@
 import React, { useState } from "react";
-import DashboardHeader from "../components/DashboardHeader";
+import { useDispatch, useSelector } from "react-redux";
+import { createWithdrawal } from "../Redux/reducer/withdrawlSlicer";
+
 
 const WithdrawalPage = () => {
-    // Local form state
+    const dispatch = useDispatch();
+    const createWithdrawal = useSelector((state) => state.withdrawal);
+
     const [amount, setAmount] = useState("");
     const [usdtAddress, setUsdtAddress] = useState("");
     const [selectedMethod, setSelectedMethod] = useState("usdt");
 
-    // Handle submit (dummy)
-    const handleWithdraw = () => {
+    const handleWithdraw = async () => {
         if (!amount || !usdtAddress) {
             alert("Please enter amount and USDT address");
             return;
         }
-        alert(`Withdrawal request submitted!\nAmount: $${amount}\nUSDT Address: ${usdtAddress}`);
-        setAmount("");
-        setUsdtAddress("");
+
+        try {
+            const response = await dispatch(
+                createWithdrawal({ amount, usdt_address: usdtAddress })
+            ).unwrap(); // unwrap will throw if rejected
+
+            alert(`Withdrawal request submitted!\nAmount: $${response.amount}\nStatus: ${response.status}`);
+            setAmount("");
+            setUsdtAddress("");
+        } catch (err) {
+            alert(`Error: ${err.message || "Something went wrong"}`);
+        }
     };
 
     return (
         <div className="min-h-screen bg-gray-200">
-            <DashboardHeader />
 
-            <div className="max-w-6xl mx-auto px-4 py-6">
+            <div className="max-w-6xl mx-auto pt-4">
                 {/* Alert Banner */}
-                <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white p-4 rounded-lg mb-8 flex items-start gap-3 shadow-md">
+                <div className="bg-gradient-to-r from-red-500 to-orange-500 text-gray-50 p-2 rounded-lg mb-4 flex items-start gap-3 shadow-md">
                     <div className="mt-0.5">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                     </div>
                     <div>
-                        <p className="text-sm opacity-90 mt-1">
+                        <p className="text-sm text-gray-50 opacity-90 mt-1">
                             Withdrawal will be available when your traders make 10 FTD. Until that moment, the commission is accumulated on your balance.
                         </p>
                     </div>
@@ -64,8 +75,10 @@ const WithdrawalPage = () => {
                                             <span className="text-sm font-medium">USDT</span>
                                         </button>
                                         <button
-                                            onClick={() => setSelectedMethod("bank")}
-                                            className={`p-3 border rounded-lg flex items-center justify-center gap-2 transition-all ${selectedMethod === "bank" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300"}`}
+                                            onClick={handleWithdraw}
+                                            disabled={!amount || !usdtAddress || loading}
+                                            className={`w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-lg font-medium shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed`}
+
                                         >
                                             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

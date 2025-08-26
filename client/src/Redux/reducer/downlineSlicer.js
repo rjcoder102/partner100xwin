@@ -2,14 +2,23 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../api";
 
 
-// ✅ Async thunk for fetching downline users
+// redux/slices/downlineSlice.js
 export const fetchDownlineUsers = createAsyncThunk(
     "downline/fetchDownlineUsers",
-    async (filter, { rejectWithValue }) => {
+    async (filters = {}, { rejectWithValue }) => {
         try {
+            const { filter, startDate, endDate } = filters;
+            const params = new URLSearchParams();
+
+            if (filter) params.append('filter', filter);
+            if (startDate) params.append('startDate', startDate);
+            if (endDate) params.append('endDate', endDate);
+
             const res = await api.get(
-                `/auth/get-downline-user?filter=${filter || ""}`, { withCredentials: true }
+                `/auth/get-downline-user?${params.toString()}`,
+                { withCredentials: true }
             );
+
             console.log("📌 Downline API response:", res.data);
             return res.data;
         } catch (err) {

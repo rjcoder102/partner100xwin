@@ -1,11 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaSearch, FaCopy, FaEdit, FaTrash, FaShareAlt } from 'react-icons/fa';
-import DashboardHeader from './DashboardHeader';
+import DashboardHeader from '../components/DashboardHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from '../Redux/reducer/authSlice';
 
 const LinksPage = () => {
-
 
   const dispatch = useDispatch()
 
@@ -24,7 +24,7 @@ const LinksPage = () => {
   const [links, setLinks] = useState([
     {
       id: 1529756,
-      url: `https://100xwins.com/register?refercode=${userInfo.code}`,
+      url: `https://100xwins.com/register?refercode=${userInfo?.code || ""}`,
       comment: '',
       type: 'Register link',
       program: 'Turnover Sharing',
@@ -80,9 +80,7 @@ const LinksPage = () => {
 
   return (
     <div className=" min-h-screen">
-      <DashboardHeader />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 ">
+      <div className="max-w-6xl mx-auto pt-6 ">
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {/* Header Section */}
           <div className="px-6 py-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -216,4 +214,6 @@ const LinksPage = () => {
   );
 };
 
-export default LinksPage;
+
+
+export default LinksPage
