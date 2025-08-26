@@ -6,29 +6,13 @@ import { getDownlineDeposits } from '../Redux/reducer/withdrawlSlicer';
 const Deposit = () => {
     const dispatch = useDispatch();
     const deposits = useSelector(state => state.deposits);
-    const { downlineDeposits } = useSelector(state => state.withrawal);
+        const {downlineDeposits} = useSelector(state => state.withrawal);
+    console.log("response data main", downlineDeposits);
+    
     const [filter, setFilter] = useState("month");
     const [dateFilter, setDateFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-
-    const [filter, setFilter] = useState("month"); // day, week, month
-    const [dateFilter, setDateFilter] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
-    const [search, setSearch] = useState("");
-
-    const dispatch = useDispatch();
-
-    // Redux store se users + loading + error
-    const { depositeData, loading, error } = useSelector((state) => state.downline);
-
-    console.log("depositeData", depositeData?.depositRows?.length);
-
-    // ✅ API call
-    useEffect(() => {
-        dispatch(fetchDownlineDeposte(filter));
-    }, [dispatch, filter]);
 
     const statusStyles = {
         Completed: { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
@@ -36,7 +20,7 @@ const Deposit = () => {
         Failed: { bg: "bg-red-100", text: "text-red-800", dot: "bg-red-500" },
         "1": { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
         "0": { bg: "bg-yellow-100", text: "text-yellow-800", dot: "bg-yellow-500" },
-        "2": { bg: "bg-red-100", text: "text-red-800", dot: "bg-red-500" },
+        "2": { bg: "bg-red-100", text: "text-red-800", dot: "bg-red-500" }, 
     };
 
     function currency(amount, code = "INR") {
@@ -60,6 +44,7 @@ const Deposit = () => {
             filters.startDate = dateFilter;
             filters.endDate = dateFilter;
         }
+
         dispatch(getDownlineDeposits(filters));
     }, [dispatch, filter, dateFilter]);
 
@@ -240,6 +225,7 @@ const Deposit = () => {
                             )}
                         </div>
                     </div>
+                </div>
 
                 {/* Deposits Table */}
                 <div className="bg-white shadow-md rounded-xl overflow-hidden mb-8">
@@ -395,11 +381,10 @@ const Deposit = () => {
                                     Next
                                 </button>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
-            )}
-
+            </div>
         </div>
     );
 };
