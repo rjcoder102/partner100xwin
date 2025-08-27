@@ -65,7 +65,6 @@ const Myaccount = () => {
                 alert(res.payload.message || "Password change failed!");
             }
         })
-        console.log("Password Change Data:", security);
     };
 
     const inputClass = `w-full p-3 rounded-lg bg-gray-100 text-gray-800

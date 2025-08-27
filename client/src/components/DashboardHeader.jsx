@@ -66,9 +66,13 @@ const DashboardHeader = () => {
 
     // ✅ Logout Handler
     const handleLogout = async () => {
-        await dispatch(logoutUser());
-        setShowAccountDropdown(false);
-        navigate("/signin"); // Redirect to login page
+        await dispatch(logoutUser()).then((res) => {
+            if(res.payload.success){
+        navigate("/signin"); 
+            } else {
+                alert(res.payload.message || "Logout failed!");
+            }
+        })
     };
 
     const location = useLocation();
@@ -178,9 +182,9 @@ const DashboardHeader = () => {
                             </button>
                             {isLanguageMenuOpen && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                                    {languages.map((lang) => (
+                                    {languages.map((lang, i) => (
                                         <button
-                                            key={lang.code}
+                                            key={i}
                                             className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100"
                                             onClick={() => setIsLanguageMenuOpen(false)}
                                         >

@@ -267,9 +267,9 @@ const Deposit = () => {
                                                 </td>
                                                 <td className="p-4">
                                                     <div className="flex items-center">
-                                                        <div className="w-8 h-8 bg-gray-300 rounded-full mr-3 flex items-center justify-center">
+                                                        <div className="w-8 h-8  mr-3 flex items-center justify-center">
                                                             <span className="text-sm font-medium text-gray-600">
-                                                                {/* {(d.user?.name || d.user_id || 'U').charAt(0).toUpperCase()} */}
+                                                                {d.username }
                                                             </span>
                                                         </div>
                                                         <div>

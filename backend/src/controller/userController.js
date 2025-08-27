@@ -665,7 +665,7 @@ export const logoutUser = async (req, res) => {
         // const { id } = req.user;
         // await pool1.query("UPDATE users SET token = NULL WHERE id = ?", [id]);
 
-        res.json({ message: "Logout successful" });
+        res.json({ message: "Logout successful", success: true });
     } catch (error) {
         console.error("Logout error:", error);
         res.status(500).json({ message: "Server error" });

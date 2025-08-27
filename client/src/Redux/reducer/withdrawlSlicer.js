@@ -148,7 +148,7 @@ const withdrawalSlice = createSlice({
             .addCase(getDownlineDeposits.fulfilled, (state, action) => {
                 // console.log("action",action.payload);
                 state.downlineDeposits.loading = false;
-                state.downlineDeposits.data = action.payload.downlineDeposites
+                state.downlineDeposits.data = action.payload.depositRows
 ;
             })
             .addCase(getDownlineDeposits.rejected, (state, action) => {

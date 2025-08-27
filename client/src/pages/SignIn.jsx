@@ -25,7 +25,7 @@ const SignIn = () => {
     useEffect(() => {
         if (userInfo) {
             // navigate("/otpcode", { state: { email: user.email } });
-            navigate("/dasboardpage", { state: { email: userInfo.email } });
+            navigate("/dasboardpage", { state: { email: userInfo?.email } });
         }
     }, [userInfo, navigate]);
 
@@ -48,8 +48,8 @@ const SignIn = () => {
                     Enter your details to login to your account
                 </p>
 
-                {error && <p className="text-red-500 mb-2">{error}</p>}
-                {userInfo && <p className="text-green-500 mb-2">Welcome {userInfo.email}</p>}
+                {/* {error && <p className="text-red-500 mb-2">{error}</p>} */}
+                {userInfo && <p className="text-green-500 mb-2">Welcome {userInfo?.email}</p>}
 
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <input

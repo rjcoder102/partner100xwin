@@ -138,9 +138,9 @@ const DashboardPage = () => {
                             <div className="flex items-center space-x-2">
                                 <span className="text-sm text-gray-500">For all links</span>
                                 <div className="flex flex-wrap gap-2">
-                                    {["day", "week", "month"].map((type) => (
+                                    {["day", "week", "month"].map((type, i) => (
                                         <button
-                                            key={type}
+                                            key={i}
                                             onClick={() => {
                                                 setFilter(type);
                                                 setCurrentPage(1);
@@ -162,7 +162,7 @@ const DashboardPage = () => {
                             {/* Y-axis labels */}
                             <div className="flex flex-col justify-between pb-8 pr-2 text-right text-xs text-gray-500">
                                 {[...Array(6)].map((_, i) => (
-                                    <div key={`y-label-${i}`} >{5 - i}</div>
+                                    <div key={i} >{5 - i}</div>
                                 ))}
                             </div>
 
