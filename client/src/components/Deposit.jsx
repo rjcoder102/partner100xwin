@@ -6,9 +6,9 @@ import { getDownlineDeposits } from '../Redux/reducer/withdrawlSlicer';
 const Deposit = () => {
     const dispatch = useDispatch();
     const deposits = useSelector(state => state.deposits);
-        const {downlineDeposits} = useSelector(state => state.withrawal);
+    const { downlineDeposits } = useSelector(state => state.withrawal);
     console.log("response data main", downlineDeposits);
-    
+
     const [filter, setFilter] = useState("month");
     const [dateFilter, setDateFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -20,7 +20,7 @@ const Deposit = () => {
         Failed: { bg: "bg-red-100", text: "text-red-800", dot: "bg-red-500" },
         "1": { bg: "bg-green-100", text: "text-green-800", dot: "bg-green-500" },
         "0": { bg: "bg-yellow-100", text: "text-yellow-800", dot: "bg-yellow-500" },
-        "2": { bg: "bg-red-100", text: "text-red-800", dot: "bg-red-500" }, 
+        "2": { bg: "bg-red-100", text: "text-red-800", dot: "bg-red-500" },
     };
 
     function currency(amount, code = "INR") {
