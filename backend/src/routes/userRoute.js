@@ -10,6 +10,7 @@ import {
     logoutUser,
     registerUser,
     resendOtp,
+    staticalData,
     updateDealyShare,
     updatePassword,
     updateUser,
@@ -17,7 +18,7 @@ import {
 } from '../controller/userController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { updateAllUserLevels } from '../controller/updateLevelController.js';
-import { createWithdrawalRequest } from '../controller/userWithdrowalController.js';
+import { createWithdrawalRequest, getPendingWinthdrowal } from '../controller/userWithdrowalController.js';
 
 
 const router = express.Router();
@@ -36,6 +37,7 @@ router.post("/resend-otp", authMiddleware, resendOtp);
 router.post("/user-withdrowal", authMiddleware, createWithdrawalRequest);
 router.get("/get-bet-history", gameHistory);
 router.get("/statical", authMiddleware, staticalData);
+router.get("/pendig-withdrowal", authMiddleware, getPendingWinthdrowal);
 // router.post("/update-leve", updateAllUserLevels);
 router.post("/logout", logoutUser);
 
