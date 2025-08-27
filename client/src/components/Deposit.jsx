@@ -9,7 +9,7 @@ const Deposit = () => {
     const { downlineDeposits } = useSelector(state => state.withrawal);
     console.log("response data main", downlineDeposits);
 
-    const [filter, setFilter] = useState("month");
+    const [filter, setFilter] = useState("all");
     const [dateFilter, setDateFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
@@ -179,7 +179,7 @@ const Deposit = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         {/* Time Period Buttons */}
                         <div className="flex flex-wrap gap-2">
-                            {["day", "week", "month"].map((type) => (
+                            {["all", "day", "week", "month"].map((type) => (
                                 <button
                                     key={type}
                                     onClick={() => {

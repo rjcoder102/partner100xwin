@@ -4,6 +4,7 @@ import { createWithdrawal } from "../Redux/reducer/withdrawlSlicer";
 
 const WithdrawalPage = () => {
     const dispatch = useDispatch();
+    const { userInfo, loading } = useSelector((state) => state.auth);
 
     const [amount, setAmount] = useState("");
     const [usdtAddress, setUsdtAddress] = useState("");
@@ -149,8 +150,8 @@ const WithdrawalPage = () => {
                                     disabled={!amount || !usdtAddress }
                                     className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-lg font-medium shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {/* {loading ?"Processing..." : "Request Withdrawal"} */}
-                                    Processing...
+                                    {loading ?"Processing..." : "Request Withdrawal"}
+                                    {/* Processing... */}
                                 </button>
                             </div>
                         </div>
@@ -211,11 +212,11 @@ const WithdrawalPage = () => {
                             <div className="space-y-4">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Total Balance:</span>
-                                    <span className="font-medium">$2,450.00</span>
+                                    <span className="font-medium">${userInfo?.balance}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Available for Withdrawal:</span>
-                                    <span className="font-medium text-green-600">$1,890.00</span>
+                                    <span className="font-medium text-green-600">${userInfo?.balance}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Pending Withdrawals:</span>

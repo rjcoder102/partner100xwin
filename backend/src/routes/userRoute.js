@@ -10,6 +10,7 @@ import {
     logoutUser,
     registerUser,
     resendOtp,
+    staticalData,
     updateDealyShare,
     updatePassword,
     updateUser,

@@ -7,31 +7,25 @@ import { BsRobot } from "react-icons/bs";
 import { FiCalendar } from "react-icons/fi";
 import DashboardHeader from './DashboardHeader';
 import { useSelector, useDispatch } from 'react-redux';
-import { getUser } from '../Redux/reducer/authSlice';
+import { getUser, staticalDataCode} from '../Redux/reducer/authSlice';
 
 const DashboardPage = () => {
 
     const dispatch = useDispatch()
 
-    const { userInfo, loading } = useSelector((state) => state.auth);
-
-    // console.log("from dashbnoard page", userInfo);
+    const { userInfo, loading, staticdata } = useSelector((state) => state.auth);
 
 
-    useEffect(() => {
-        // const token = Cookies.get("token");
-        if (!userInfo) {
-            dispatch(getUser());
-        }
-    }, [dispatch]);
 
-    // params path
+useEffect(() => {
+    if (!userInfo) {
+        dispatch(getUser());
+    }
+    dispatch(staticalDataCode());
+     console.log("useEffect triggered");
+}, []); 
+console.log(staticdata)
 
-    // const location = useLocation();
-    // const queryParams = new URLSearchParams(location.search);
-    // const redirect = queryParams.get("redirect");
-
-    // console.log("Redirect:", redirect);
 
     return (
         <div className=' '>
@@ -111,20 +105,20 @@ const DashboardPage = () => {
                         {/* Stat Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div className="bg-[#1E1E2D] text-white p-6 rounded-2xl">
-                                <p className="text-2xl font-bold">$0</p>
-                                <p className="text-sm text-gray-300 mt-2">0 deposits</p>
+                                <p className="text-2xl font-bold">${staticdata?.totalDepositeAmount}</p>
+                                <p className="text-sm text-gray-300 mt-2">Total deposits</p>
                             </div>
                             <div className="bg-purple-50 p-6 rounded-2xl">
-                                <p className="text-2xl font-bold">$0</p>
-                                <p className="text-sm text-purple-600 mt-2">0 FTD’s</p>
+                                <p className="text-2xl font-bold">${staticdata?.totalWithdrowalAmount}</p>
+                                <p className="text-sm text-purple-600 mt-2"> Total Withdrawal</p>
                             </div>
                             <div className="bg-yellow-50 p-6 rounded-2xl">
-                                <p className="text-2xl font-bold">0</p>
-                                <p className="text-sm text-yellow-600 mt-2">Clicks</p>
+                                <p className="text-2xl font-bold">{staticdata?.downlineRows?.length}</p>
+                                <p className="text-sm text-yellow-600 mt-2">Total User</p>
                             </div>
                             <div className="bg-blue-50 p-6 rounded-2xl">
                                 <p className="text-2xl font-bold">0</p>
-                                <p className="text-sm text-blue-600 mt-2">Registrations</p>
+                                <p className="text-sm text-blue-600 mt-2">Commission</p>
                             </div>
                         </div>
                     </div>

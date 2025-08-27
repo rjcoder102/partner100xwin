@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardHeader from '../components/DashboardHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { profileUpdate, updatePassword } from '../Redux/reducer/authSlice';

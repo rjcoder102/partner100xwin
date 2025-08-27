@@ -27,7 +27,7 @@ const UserInformation = () => {
     // Fetch game history when tab is active
     useEffect(() => {
             dispatch(getSingleUserById(id));
-    }, [, dispatch]);
+    }, [ dispatch]);
 
     console.log(singleuser, data, 'singleuser');
 
@@ -77,7 +77,7 @@ const UserInformation = () => {
                                         <div className="md:ml-6 text-center md:text-left">
                                             <h3 className="text-2xl font-bold text-gray-800">{singleuser?.name}</h3>
                                             <p className="text-gray-600">{singleuser?.email}</p>
-                                            <p className="text-gray-500 text-sm mt-1">Joined: {singleuser?.created_at}</p>y
+                                            <p className="text-gray-500 text-sm mt-1">Joined: {singleuser?.created_at}</p>
                                             
                                         </div>
                                     </div>

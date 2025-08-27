@@ -550,7 +550,7 @@ export const staticalData = async (req, res) => {
         let totalDepositeAmount = totalDeposite[0]?.totalAmount || 0;
         let totalWithdrowalAmount = totalwithdrawal[0]?.totalAmount || 0;
         let totalBalance = Number(currentBalanceRows[0]?.totalBalance) || 0;
-        const downlineRows = await pool2.query(query, withdrawalValues);
+        const [downlineRows] = await pool2.query(query, withdrawalValues);
 
         res.json({
             userInfo,
