@@ -35,6 +35,7 @@ router.post("/otp-verify", authMiddleware, verifyOtp);
 router.post("/resend-otp", authMiddleware, resendOtp);
 router.post("/user-withdrowal", authMiddleware, createWithdrawalRequest);
 router.get("/get-bet-history", gameHistory);
+router.get("/statical", authMiddleware, staticalData);
 // router.post("/update-leve", updateAllUserLevels);
 router.post("/logout", logoutUser);
 

@@ -484,6 +484,87 @@ export const getwithdrawlData = async (req, res) => {
     }
 };
 
+export const staticalData = async (req, res) => {
+    const { id } = req.user;
+
+    try {
+        const [userRows] = await pool1.query(
+            "SELECT * FROM users WHERE id = ?",
+            [id]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ message: "No user found" });
+        }
+
+        let userInfo = userRows[0];
+        let startDate = userInfo.setelment_date;
+
+        // ✅ Single base query with static startDate filter
+        let depositeQuery = `
+            FROM depositrequests 
+            WHERE refral_code = ? 
+            AND status = 1`;
+        let depositeValues = [userInfo.code];
+
+        // ✅ Get deposits + total in one line each
+        const [depositeRows] = await pool2.query(
+            `SELECT * ${depositeQuery} ORDER BY updated_at DESC`,
+            depositeValues
+        );
+
+        // console.log("depositeRows", depositeRows);
+
+
+        const [totalDeposite] = await pool2.query(
+            `SELECT SUM(amount) AS totalAmount ${depositeQuery}`,
+            depositeValues
+        );
+
+        // ✅ Single base query with static startDate filter for withdrowal amount
+        let withdrawalQuery = `
+            FROM withdrawrequests 
+            WHERE refral_code = ? 
+            AND status = 1`;
+        let withdrawalValues = [userInfo.code,];
+
+        // ✅ Get deposits + total in one line each
+        const [withdrawalRows] = await pool2.query(
+            `SELECT * ${withdrawalQuery} ORDER BY updated_at DESC`,
+            withdrawalValues
+        );
+
+        const [totalwithdrawal] = await pool2.query(
+            `SELECT SUM(amount) AS totalAmount ${withdrawalQuery}`,
+            withdrawalValues
+        );
+
+        // ✅ Get total balance of all users with same refral_code
+        const [currentBalanceRows] = await pool2.query(
+            `SELECT SUM(balance) AS totalBalance FROM users WHERE refral_code = ?`,
+            [userInfo.code]
+        );
+        let query = "SELECT * FROM users WHERE refral_code = ?";
+
+
+        let totalDepositeAmount = totalDeposite[0]?.totalAmount || 0;
+        let totalWithdrowalAmount = totalwithdrawal[0]?.totalAmount || 0;
+        let totalBalance = Number(currentBalanceRows[0]?.totalBalance) || 0;
+        const downlineRows = await pool2.query(query, withdrawalValues);
+
+        res.json({
+            userInfo,
+            totalDepositeAmount,
+            totalWithdrowalAmount,
+            totalBalance,
+            downlineRows
+
+        });
+    } catch (error) {
+        console.error("Error fetching downline deposits:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 export const updateDealyShare = async (req, res) => {
     const { id } = req.user;
 
