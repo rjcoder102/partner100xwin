@@ -31,7 +31,7 @@ function App() {
         {/* Wrap Layout inside PrivateRoute if needed */}
         <Route element={<PrivateRoute />}>
           <Route path="" element={<Layout />}>
-            <Route path="userinformation" element={<UserInformation />} />
+            <Route path="userinformation/:id" element={<UserInformation />} />
             <Route path="myaccount" element={<Myaccount />} />
             <Route path="selfwithdrawl" element={<SelfWithdrawl />} />
             <Route path="deposit" element={<Deposit />} />

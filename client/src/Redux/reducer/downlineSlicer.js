@@ -48,12 +48,29 @@ export const fetchGameHistory = createAsyncThunk(
     }
 );
 
+export const getSingleUserById = createAsyncThunk(
+    "user/getSingleUserById",
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/auth/getsingleuserbyid/${id}`, {
+                withCredentials: true,
+            });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data || { message: "Something went wrong" }
+            );
+        }
+    }
+);
+
 
 const downlineSlice = createSlice({
     name: "downline",
     name: "gameHistory",
     initialState: {
         users: [],
+        singleuser: null,
         depositeData: [],
         loading: false,
         error: null,
@@ -98,6 +115,20 @@ const downlineSlice = createSlice({
                 state.data = action.payload?.data || null;
             })
             .addCase(fetchGameHistory.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message || "Failed to fetch game history";
+            })
+            //Single User
+            .addCase(getSingleUserById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getSingleUserById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.singleuser = action.payload?.user || null;
+                state.data = action.payload || null;
+            })
+            .addCase(getSingleUserById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload?.message || "Failed to fetch game history";
             });

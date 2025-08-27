@@ -51,7 +51,7 @@ const Deposit = () => {
 
     // Filtering Logic for client-side (if needed)
     const filteredDeposits = useMemo(() => {
-        if (!deposits?.data || deposits.data.length === 0) return [];
+        if (!deposits?.data || deposits.data?.length === 0) return [];
 
         let data = [...deposits.data];
 
@@ -66,7 +66,7 @@ const Deposit = () => {
     }, [deposits?.data, dateFilter]);
 
     // Pagination Logic
-    const totalPages = Math.ceil(filteredDeposits.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredDeposits?.length / itemsPerPage);
     const paginatedDeposits = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         return filteredDeposits.slice(startIndex, startIndex + itemsPerPage);
@@ -74,14 +74,14 @@ const Deposit = () => {
 
     // Summary Stats
     const summary = useMemo(() => {
-        const totalDeposits = filteredDeposits.length;
+        const totalDeposits = filteredDeposits?.length;
         const totalAmount = filteredDeposits.reduce(
             (sum, d) => sum + (d.amount || 0),
             0
         );
         const successful = filteredDeposits.filter(
             (d) => d.status === "Completed" || d.status === 1
-        ).length;
+        )?.length;
         const uniqueUsers = new Set(filteredDeposits.map(d => d.user?.name || d.user_id || d.id)).size;
 
         return { totalDeposits, totalAmount, successful, uniqueUsers };
@@ -152,9 +152,9 @@ const Deposit = () => {
                             {summary.successful}
                         </p>
                         <p className="text-xs text-gray-400 mt-1">
-                            {filteredDeposits.length > 0
+                            {filteredDeposits?.length > 0
                                 ? `${Math.round(
-                                    (summary.successful / filteredDeposits.length) * 100
+                                    (summary.successful / filteredDeposits?.length) * 100
                                 )}% success rate`
                                 : "No data"}
                         </p>
@@ -167,8 +167,8 @@ const Deposit = () => {
                             {summary.uniqueUsers}
                         </p>
                         <p className="text-xs text-gray-400 mt-1">
-                            {filteredDeposits.length > 0
-                                ? `Avg ${(filteredDeposits.length / summary.uniqueUsers).toFixed(1)} deposits per user`
+                            {filteredDeposits?.length > 0
+                                ? `Avg ${(filteredDeposits?.length / summary.uniqueUsers).toFixed(1)} deposits per user`
                                 : "No data"}
                         </p>
                     </div> */}
@@ -242,7 +242,7 @@ const Deposit = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {downlineDeposits.data.length > 0 ? (
+                                {downlineDeposits.data?.length > 0 ? (
                                     downlineDeposits.data.map((d) => {
                                         const statusText = getStatusText(d.status);
                                         const formattedDate = formatDate(d.updated_at || d.createdAt);
@@ -329,7 +329,7 @@ const Deposit = () => {
                     </div>
 
                     {/* Pagination */}
-                    {filteredDeposits.length > 0 && (
+                    {filteredDeposits?.length > 0 && (
                         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
                             <div className="text-sm text-gray-500">
                                 Showing{" "}
@@ -338,9 +338,9 @@ const Deposit = () => {
                                 </span>{" "}
                                 to{" "}
                                 <span className="font-medium">
-                                    {Math.min(currentPage * itemsPerPage, filteredDeposits.length)}
+                                    {Math.min(currentPage * itemsPerPage, filteredDeposits?.length)}
                                 </span>{" "}
-                                of <span className="font-medium">{filteredDeposits.length}</span>{" "}
+                                of <span className="font-medium">{filteredDeposits?.length}</span>{" "}
                                 results
                             </div>
                             <div className="flex space-x-2">

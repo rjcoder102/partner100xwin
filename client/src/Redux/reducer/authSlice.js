@@ -104,6 +104,39 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
+export const updatePassword = createAsyncThunk(
+  "auth/updatePassword",
+  async ({newPassword, oldPassword}, { rejectWithValue }) => {
+    try {
+      const res = await api.post("/auth/password-update", {newPassword, oldPassword}, {
+        withCredentials: true,
+      });
+      return res?.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Password update failed"
+      );
+    }
+  }
+);
+export const profileUpdate = createAsyncThunk(
+  "auth/profile",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await api.post("/auth/profile-update", data, {
+        withCredentials: true,
+      });
+      return res?.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Password update failed"
+      );
+    }
+  }
+);
+
+// Utility to decode JWT token
+
 
 const decodeToken = (token) => {
   if (token) {

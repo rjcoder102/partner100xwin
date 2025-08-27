@@ -64,7 +64,7 @@ const WithdrawalPage = () => {
 
                             <div className="p-6">
                                 {/* Payment Method Selection */}
-                                <div className="mb-6">
+                                {/* <div className="mb-6">
                                     <h3 className="text-sm font-medium text-gray-700 mb-3">Select Payment Method</h3>
                                     <div className="grid grid-cols-2 gap-3">
                                         <button
@@ -90,7 +90,7 @@ const WithdrawalPage = () => {
                                             <span className="text-sm font-medium">Bank Transfer</span>
                                         </button>
                                     </div>
-                                </div>
+                                </div> */}
 
                                 {/* Amount Input */}
                                 <div className="mb-6">
@@ -253,19 +253,6 @@ const WithdrawalPage = () => {
                                     Contact Support
                                 </button>
                             </div>
-                        </div>
-
-                        {/* USDT QR Code */}
-                        <div className="bg-white rounded-xl shadow-md p-6 text-center">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">USDT Deposit Address</h3>
-                            <div className="bg-white p-3 rounded-lg border border-gray-200 inline-block mb-4">
-                                <img
-                                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=USDT_DEPOSIT_ADDRESS_EXAMPLE"
-                                    alt="USDT QR Code"
-                                    className="w-32 h-32"
-                                />
-                            </div>
-                            <p className="text-sm text-gray-600">Scan this QR code to get our USDT deposit address</p>
                         </div>
                     </div>
                 </div>

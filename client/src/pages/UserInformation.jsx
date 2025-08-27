@@ -1,33 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchGameHistory } from "../Redux/reducer/downlineSlicer";
+import { fetchGameHistory, getSingleUserById } from "../Redux/reducer/downlineSlicer";
+import { useParams } from "react-router-dom";
 
 const UserInformation = () => {
     const [activeTab, setActiveTab] = useState("info"); // default active tab
     const dispatch = useDispatch();
+    const { id } = useParams();
 
     // Redux state
     // const { data, loading, error } = useSelector((state) => state.gameHistory);
-    const data = useSelector((state) => state.gameHistory);
-    const loading = loading || false;
-    const error = error || null;
+    // const data = useSelector((state) => state.gameHistory);
+    const { singleuser, data, loading } = useSelector((state) => state.downline);
+    const error =  null;
 
     // Sample user data
     const userData = {
-        userId: "USR-78945612",
-        totalBalance: "$2,450.00",
-        lastLoginDate: "Aug 21, 2025 14:30",
-        totalDeposit: "$5,200.00",
-        totalWithdrawal: "$2,750.00",
-        totalRecharge: "$8,950.00",
+        userId: singleuser?.id,
+        totalBalance: singleuser?.balance,
+        lastLoginDate: singleuser?.last_login,
+        totalDeposit: data?.totalDepositeAmount,
+        totalWithdrawal: data?.totalwithAmount,
+        totalRecharge: data?.totalDepositeAmount,
     };
 
     // Fetch game history when tab is active
     useEffect(() => {
-        if (activeTab === "history") {
-            dispatch(fetchGameHistory({ page: 1, size: 50 }));
-        }
-    }, [activeTab, dispatch]);
+            dispatch(getSingleUserById(id));
+    }, [, dispatch]);
+
+    console.log(singleuser, data, 'singleuser');
+
+    if (loading) {
+        return <div className="text-center py-10 text-gray-600">Loading user information...</div>;
+    }
 
     return (
         <div className="min-h-screen">
@@ -66,12 +72,12 @@ const UserInformation = () => {
                                 <div className="bg-blue-50 rounded-lg p-6 mb-8 border border-blue-100">
                                     <div className="flex flex-col md:flex-row items-center mb-6">
                                         <div className="w-24 h-24 bg-blue-200 rounded-full flex items-center justify-center text-blue-600 text-4xl font-bold mb-4 md:mb-0">
-                                            JD
+                                            {singleuser?.name ? singleuser.name.charAt(0).toUpperCase() : "U"}
                                         </div>
                                         <div className="md:ml-6 text-center md:text-left">
-                                            <h3 className="text-2xl font-bold text-gray-800">John Doe</h3>
-                                            <p className="text-gray-600">john@example.com</p>
-                                            <p className="text-gray-500 text-sm mt-1">Joined: Jan 20, 2023</p>
+                                            <h3 className="text-2xl font-bold text-gray-800">{singleuser?.name}</h3>
+                                            <p className="text-gray-600">{singleuser?.email}</p>
+                                            <p className="text-gray-500 text-sm mt-1">Joined: {singleuser?.created_at}</p>
                                         </div>
                                     </div>
                                 </div>

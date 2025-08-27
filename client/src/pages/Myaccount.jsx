@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import DashboardHeader from '../components/DashboardHeader';
+import { useDispatch, useSelector } from 'react-redux';
+import { profileUpdate, updatePassword } from '../Redux/reducer/authSlice';
 
 const Myaccount = () => {
+    const dispatch = useDispatch();
+      const { userInfo, loading } = useSelector((state) => state.auth);
     const [user, setUser] = useState({
-        firstName: "",
-        nickname: "",
-        email: "kundansharma@maxifysol", // Pre-filled from your image
-        telegramId: "",
-        country: "India",
-        trafficSources: "",
+        firstName: userInfo?.fname || "",
+        nickname:userInfo?.lname || "",
+        email: userInfo?.email || "", // Pre-filled from your image
+        telegramId: userInfo?.telegramId || "",
+        country: userInfo?.country || "",
+        trafficSources: userInfo?.traffic_source || "",
     });
 
     const [security, setSecurity] = useState({
@@ -30,7 +34,20 @@ const Myaccount = () => {
 
     const handleProfileSave = () => {
         console.log("Profile Data:", user);
-        alert("Profile saved successfully!");
+        const data = {
+            fname: user.firstName,
+            lname: user.nickname,
+            telegramId: user.telegramId,
+            country: user.country || "India",
+            traffic_source: user.trafficSources,
+        };
+        dispatch(profileUpdate(data)).then((res) =>{
+            if(res.payload.success){
+                alert("Profile updated successfully!");
+            } else {
+                alert(res.payload.message || "Profile update failed!");
+            }
+        })
     };
 
     const handleChangePassword = () => {
@@ -38,8 +55,17 @@ const Myaccount = () => {
             alert("New password and confirm password do not match!");
             return;
         }
+        dispatch(updatePassword({
+            oldPassword: security.oldPassword,
+            newPassword: security.newPassword
+        })).then((res) =>{
+            if(res.payload.success){
+                alert("Password changed successfully!");
+            } else {
+                alert(res.payload.message || "Password change failed!");
+            }
+        })
         console.log("Password Change Data:", security);
-        alert("Password changed successfully!");
     };
 
     const inputClass = `w-full p-3 rounded-lg bg-gray-100 text-gray-800
@@ -141,7 +167,7 @@ const Myaccount = () => {
                 <div className="bg-white p-6 h-[65vh] rounded-lg shadow w-full md:w-1/3">
                     <h2 className="text-xl font-semibold mb-4">Security</h2>
 
-                    <div className="flex items-center mb-4">
+                    {/* <div className="flex items-center mb-4">
                         <input
                             type="checkbox"
                             name="twoFactor"
@@ -150,7 +176,7 @@ const Myaccount = () => {
                             className="mr-2"
                         />
                         <label className="text-gray-700">Two-factor authentication on login</label>
-                    </div>
+                    </div> */}
 
                     <div className="space-y-3">
                         <div>

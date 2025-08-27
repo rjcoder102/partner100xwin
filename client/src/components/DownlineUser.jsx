@@ -357,7 +357,7 @@ const DownlineUser = () => {
                                                         <td className="p-4">
                                                             <div className="flex justify-center space-x-2">
                                                                 <Link
-                                                                    to="/userInformation"
+                                                                    to={`/userInformation/${user?.id}`}
                                                                     className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors"
                                                                     title="View Profile"
                                                                 >
