@@ -64,3 +64,47 @@ export const createWithdrawalRequest = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+
+
+export const getPendingWinthdrowal = async (req, res) => {
+    const { id, email } = req.user
+    try {
+
+        // Fetch user info (from users table)
+        const [userRows] = await pool1.query(
+            "SELECT id, email, balance FROM users WHERE id = ?",
+            [id]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        const userInfo = userRows[0];
+        // ✅ Insert withdrawal request
+        // Get all pending withdrawals for a user
+        const [pendingRows] = await pool1.query(
+            "SELECT * FROM user_withdrowal WHERE userId = ? AND status = 0",
+            [userInfo.id]
+        );
+
+        // Get total sum of pending withdrawals
+        const [sumResult] = await pool1.query(
+            "SELECT COALESCE(SUM(amount), 0) as totalPending FROM user_withdrowal WHERE userId = ? AND status = 0",
+            [userInfo.id]
+        );
+
+
+
+        return res.json({
+            success: true,
+            message: "Fetched pending withdrawals successfully",
+            data: pendingRows,
+            totalPending: sumResult[0].totalPending,
+            success: true
+        });
+    } catch (error) {
+        console.error("Error in createWithdrawalRequest:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
