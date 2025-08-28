@@ -4,6 +4,7 @@ import { FaPlus, FaSearch, FaCopy, FaEdit, FaTrash, FaShareAlt } from 'react-ico
 import DashboardHeader from '../components/DashboardHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from '../Redux/reducer/authSlice';
+import { toast } from 'sonner';
 
 const LinksPage = () => {
 
@@ -47,7 +48,7 @@ const LinksPage = () => {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    alert('Link copied to clipboard!');
+    toast.success('Link copied to clipboard!');
   };
 
   const handleShareLink = (url) => {

@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react';
 import DashboardHeader from '../components/DashboardHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { profileUpdate, updatePassword } from '../Redux/reducer/authSlice';
+import { toast } from 'sonner'; // Changed from react-toastify to sonner
 
 const Myaccount = () => {
     const dispatch = useDispatch();
-      const { userInfo, loading } = useSelector((state) => state.auth);
+    const { userInfo, loading } = useSelector((state) => state.auth);
     const [user, setUser] = useState({
         firstName: userInfo?.fname || "",
-        nickname:userInfo?.lname || "",
-        email: userInfo?.email || "", // Pre-filled from your image
+        nickname: userInfo?.lname || "",
+        email: userInfo?.email || "",
         telegramId: userInfo?.telegramId || "",
         country: userInfo?.country || "",
         trafficSources: userInfo?.traffic_source || "",
@@ -33,7 +34,6 @@ const Myaccount = () => {
     };
 
     const handleProfileSave = () => {
-        console.log("Profile Data:", user);
         const data = {
             fname: user.firstName,
             lname: user.nickname,
@@ -41,30 +41,48 @@ const Myaccount = () => {
             country: user.country || "India",
             traffic_source: user.trafficSources,
         };
-        dispatch(profileUpdate(data)).then((res) =>{
+        
+        dispatch(profileUpdate(data)).then((res) => {
             if(res.payload.success){
-                alert("Profile updated successfully!");
+                toast.success("Profile updated successfully!");
             } else {
-                alert(res.payload.message || "Profile update failed!");
+                toast.error(res.payload.message || "Profile update failed!");
             }
-        })
+        }).catch((error) => {
+            toast.error("An error occurred while updating profile");
+        });
     };
 
     const handleChangePassword = () => {
         if (security.newPassword !== security.confirmPassword) {
-            alert("New password and confirm password do not match!");
+            toast.error("New password and confirm password do not match!");
             return;
         }
+        
+        if (!security.oldPassword) {
+            toast.error("Please enter your old password");
+            return;
+        }
+        
         dispatch(updatePassword({
             oldPassword: security.oldPassword,
             newPassword: security.newPassword
-        })).then((res) =>{
+        })).then((res) => {
             if(res.payload.success){
-                alert("Password changed successfully!");
+                toast.success("Password changed successfully!");
+                // Clear password fields after successful change
+                setSecurity({
+                    ...security,
+                    oldPassword: "",
+                    newPassword: "",
+                    confirmPassword: ""
+                });
             } else {
-                alert(res.payload.message || "Password change failed!");
+                toast.error(res.payload.message || "Password change failed!");
             }
-        })
+        }).catch((error) => {
+            toast.error("An error occurred while changing password");
+        });
     };
 
     const inputClass = `w-full p-3 rounded-lg bg-gray-100 text-gray-800
@@ -156,8 +174,9 @@ const Myaccount = () => {
                         <button
                             onClick={handleProfileSave}
                             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition"
+                            disabled={loading}
                         >
-                            Save
+                            {loading ? "Saving..." : "Save"}
                         </button>
                     </div>
                 </div>
@@ -165,17 +184,6 @@ const Myaccount = () => {
                 {/* Security Section */}
                 <div className="bg-white p-6 h-[65vh] rounded-lg shadow w-full md:w-1/3">
                     <h2 className="text-xl font-semibold mb-4">Security</h2>
-
-                    {/* <div className="flex items-center mb-4">
-                        <input
-                            type="checkbox"
-                            name="twoFactor"
-                            checked={security.twoFactor}
-                            onChange={handleSecurityChange}
-                            className="mr-2"
-                        />
-                        <label className="text-gray-700">Two-factor authentication on login</label>
-                    </div> */}
 
                     <div className="space-y-3">
                         <div>
@@ -216,8 +224,9 @@ const Myaccount = () => {
                     <button
                         onClick={handleChangePassword}
                         className="bg-blue-500 hover:bg-blue-600 text-white w-full mt-4 py-2 rounded-lg transition"
+                        disabled={loading}
                     >
-                        Change Password
+                        {loading ? "Changing..." : "Change Password"}
                     </button>
                 </div>
             </div>

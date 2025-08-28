@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../Redux/reducer/authSlice";
+import { toast } from "sonner";
 
 const SignIn = () => {
     const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ const SignIn = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!email || !password) {
-            alert("Please fill in both Email and Password.");
+            toast.warning("Please fill in both Email and Password.");
             return;
         }
         dispatch(loginUser({ email, password }));

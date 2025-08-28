@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createWithdrawal } from "../Redux/reducer/withdrawlSlicer";
+import { toast } from "sonner";
 
 const WithdrawalPage = () => {
     const dispatch = useDispatch();
@@ -15,7 +16,7 @@ const WithdrawalPage = () => {
         // console.log("✅ Withdrawal Request:", amount, usdtAddress);
 
         if (!amount || !usdtAddress) {
-            alert("Please enter amount and USDT address");
+            toast.warning("Please enter amount and USDT address");
             return;
         }
 
@@ -24,7 +25,7 @@ const WithdrawalPage = () => {
                 createWithdrawal({ amount, usdt_address: usdtAddress })
             ).unwrap();
 
-            alert(
+            toast.success(
                 `Withdrawal request submitted!\nAmount: $${response.amount}\nStatus: ${response.status}`
             );
 
@@ -32,7 +33,7 @@ const WithdrawalPage = () => {
             setUsdtAddress("");
         } catch (err) {
             console.error("❌ Withdrawal Error:", err);
-            alert(`Error: ${err.message || "Something went wrong"}`);
+            toast.error(`Error: ${err.message || "Something went wrong"}`);
         }
     };
 
@@ -220,7 +221,7 @@ const WithdrawalPage = () => {
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Pending Withdrawals:</span>
-                                    <span className="font-medium text-amber-600">$560.00</span>
+                                    <span className="font-medium text-amber-600">$0</span>
                                 </div>
                                 <div className="pt-4 border-t border-gray-100">
                                     <div className="flex justify-between">
