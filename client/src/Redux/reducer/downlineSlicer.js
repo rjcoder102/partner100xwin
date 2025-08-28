@@ -33,9 +33,9 @@ export const fetchDownlineUsers = createAsyncThunk(
 // ✅ Thunk to fetch bet history
 export const fetchGameHistory = createAsyncThunk(
     "gameHistory/fetchGameHistory",
-    async ({ page = 1, size = 50 }, { rejectWithValue }) => {
+    async ({ page, size, playerid }, { rejectWithValue }) => {
         try {
-            const response = await api.post("/auth/get-bet-history", { page, size });
+            const response = await api.get(`/auth/get-bet-history?page=${page}&size=${size}&playerid=${playerid}`,);
               console.log("responseddddddddddd",response.data);
             return response.data;
           
@@ -72,6 +72,7 @@ const downlineSlice = createSlice({
         users: [],
         singleuser: null,
         depositeData: [],
+        history: [],
         loading: false,
         error: null,
     },
@@ -112,7 +113,7 @@ const downlineSlice = createSlice({
             })
             .addCase(fetchGameHistory.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = action.payload?.data || null;
+                state.history = action.payload?.data.data || null;
             })
             .addCase(fetchGameHistory.rejected, (state, action) => {
                 state.loading = false;

@@ -674,17 +674,16 @@ export const updateDealyShare = async (req, res) => {
 export const gameHistory = async (req, res) => {
 
     try {
-        // const { page = 1, size = 50 } = req.body
-        // const playerid = req.userData.user.id;
+        const { page = 1, size = 50, playerid } = req.params;
         // const [userRows] = await pool1.query(
         //     "SELECT * FROM users WHERE id = ?",
         //     [id]
         // );
 
-        const page = 1
-        const size = 50
+        // const page = 1
+        // const size = 50
 
-        const playerid = 1825
+        // const playerid = 1825
 
         if (!page || !size) {
             return res.status(400).json({
