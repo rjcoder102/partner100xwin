@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteUserById, getAllUsers, getAllWithdrawals, getUserDetailById, loginAdmin, setelMantsAmount, setelMantsAmountSingleUser, updateWithdrawalStatus } from '../controller/adminController.js';
+import { deleteUserById, getAllUsers, getAllWithdrawals, getDownUsers, getUserDetailById, loginAdmin, setelMantsAmount, setelMantsAmountSingleUser, updateUserStatus, updateWithdrawalStatus } from '../controller/adminController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -13,5 +13,6 @@ router.get('/get-all-withdrawals', authMiddleware, getAllWithdrawals)
 router.put('/update-withdrawal-status/:id', authMiddleware, updateWithdrawalStatus)
 router.post('/user-setelments', setelMantsAmount)
 router.post('/sigle-user-setelments/:userId', setelMantsAmountSingleUser)
+router.get('/get-downline-user/:id', authMiddleware, getDownUsers)
 
 export default router;

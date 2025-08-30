@@ -1,30 +1,40 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AllUsers, getDownline, getSingleUser, updateUserStatus } from '../Redux/Reducer/adminReducer';
+import { useParams, useNavigate } from 'react-router-dom';
 
 // DownlineUsers Page Component
 const DownlineUser = () => {
-  const [members, setMembers] = useState([
-    { id: 1, name: 'John Doe', email: 'john@example.com', status: 'Active', balance: '$1,250', joined: 'Jan 12, 2023' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', status: 'Active', balance: '$3,420', joined: 'Jan 11, 2023' },
-    { id: 3, name: 'Robert Johnson', email: 'robert@example.com', status: 'Blocked', balance: '$850', joined: 'Jan 10, 2023' },
-    { id: 4, name: 'Sarah Williams', email: 'sarah@example.com', status: 'Active', balance: '$2,150', joined: 'Jan 9, 2023' },
-  ]);
-
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const {downlinedata, singleuser} = useSelector((state) => state.admin);
+  const dispatch = useDispatch();
+  
   const [editingId, setEditingId] = useState(null);
   const [tempStatus, setTempStatus] = useState('');
 
-  const toggleBlockUser = (id) => {
-    setMembers(members.map(member => 
-      member.id === id 
-        ? { ...member, status: member.status === 'Active' ? 'Blocked' : 'Active' } 
-        : member
-    ));
+  useEffect(() => {
+    dispatch(getDownline(id));
+    dispatch(getSingleUser(id));
+  }, [dispatch, id]);
+
+  // Calculate total downline balance and count
+  const totalDownlineBalance = downlinedata?.reduce((total, user) => total + (parseFloat(user.balance) || 0), 0) || 0;
+  const downlineCount = downlinedata?.length || 0;
+
+  const deleteMember = (id) => {
+    dispatch(deleteUser(id)).then((res) => {
+      if (res.payload.success) {
+        dispatch(getDownline(id));
+        toast.success(res.payload.message);
+      } else {
+        toast.error(res.payload.message || "Failed to delete user");
+      }
+    });
   };
 
-  const deleteUser = (id) => {
-    setMembers(members.filter(member => member.id !== id));
-  };
-
-  const startEditing = (id, currentStatus) => {
+  const updateStatus = (id, currentStatus) => {
     setEditingId(id);
     setTempStatus(currentStatus);
   };
@@ -35,18 +45,25 @@ const DownlineUser = () => {
   };
 
   const saveStatus = (id) => {
-    setMembers(members.map(member => 
-      member.id === id 
-        ? { ...member, status: tempStatus } 
-        : member
-    ));
+    dispatch(updateUserStatus({ id: id, status: tempStatus })).then((res) => {
+      if (res.payload.success) {
+        dispatch(getDownline(id));
+        toast.success(res.payload.message);
+      } else {
+        toast.error(res.payload.message || "Failed to update status");
+      }
+    });
     setEditingId(null);
-    setTempStatus('');
   };
 
-  const viewProfile = (id) => {
-    // In a real app, this would navigate to the user's profile page
-    alert(`Viewing profile of user with ID: ${id}`);
+  const getStatusText = (status) => {
+    return status === '0' ? 'Active' : 'Blocked';
+  };
+
+  const getStatusClass = (status) => {
+    return status === '0' 
+      ? 'bg-green-100 text-green-800' 
+      : 'bg-red-100 text-red-800';
   };
 
   return (
@@ -55,89 +72,138 @@ const DownlineUser = () => {
         <h1 className="text-2xl font-bold text-gray-800">Downline Users</h1>
       </div>
 
+      {/* User Details Section */}
+      {singleuser && (
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">User Details</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <p className="text-sm text-gray-500">Name</p>
+              <p className="font-medium">{singleuser.fname} {singleuser.lname}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Email</p>
+              <p className="font-medium">{singleuser.email}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Code</p>
+              <p className="font-medium">{singleuser.code}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Status</p>
+              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(singleuser.status)}`}>
+                {getStatusText(singleuser.status)}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Downline Summary Section */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Downline Summary</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm text-blue-600">Total Downline Users</p>
+            <p className="text-2xl font-bold text-blue-800">{downlineCount}</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <p className="text-sm text-green-600">Total Downline Balance</p>
+            <p className="text-2xl font-bold text-green-800">${totalDownlineBalance.toFixed(2)}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Downline Users Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Password</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th> */}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {members.map((member) => (
-                <tr key={member.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
+              {downlinedata?.map((member, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-2 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <img className="h-10 w-10 rounded-full" src={`https://ui-avatars.com/api/?name=${member.name}&background=0D8ABC&color=fff`} alt=""/>
+                      <div className="flex-shrink-0 h-8 w-8">
+                        <img className="h-8 w-8 rounded-full" src={`https://ui-avatars.com/api/?name=${member?.name || member?.fname}&background=0D8ABC&color=fff`} alt=""/>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{member.name}</div>
+                        <div className="text-sm font-medium text-gray-900">{member?.fname} {member?.lname}</div>
                         <div className="text-sm text-gray-500">{member.email}</div>
                       </div>
                     </div>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member?.role}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${member?.balance || 0}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member?.password}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {member?.created_at ? new Date(member.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : ''}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {editingId === member.id ? (
+                    {editingId === member?.id ? (
                       <select
                         value={tempStatus}
                         onChange={(e) => setTempStatus(e.target.value)}
                         className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                       >
-                        <option value="Active">Active</option>
-                        <option value="Blocked">Blocked</option>
-                        <option value="Pending">Pending</option>
+                        <option value="0">Active</option>
+                        <option value="1">Blocked</option>
                       </select>
                     ) : (
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${member.status === 'Active' ? 'bg-green-100 text-green-800' : member.status === 'Blocked' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                        {member.status}
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-50 text-green-800`}>
+                        Active
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member.balance}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member.joined}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  {/* <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     {editingId === member.id ? (
-                      <>
+                      <div className='space-x-2'>
                         <button 
-                          className="text-green-600 hover:text-green-900 mr-3"
+                          className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md text-xs"
                           onClick={() => saveStatus(member.id)}
                         >
                           Update
                         </button>
                         <button 
-                          className="text-gray-600 hover:text-gray-900"
+                         className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-xs"
                           onClick={cancelEditing}
                         >
                           Cancel
                         </button>
-                      </>
+                      </div>
                     ) : (
-                      <>
+                      <div className='space-x-2'>
                         <button 
-                          className="text-blue-600 hover:text-blue-900 mr-3"
-                          onClick={() => startEditing(member.id, member.status)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-xs"
+                          onClick={() => updateStatus(member.id, member.status)}
                         >
                           Update
                         </button>
                         <button 
-                          className="text-red-600 hover:text-red-900 mr-3"
-                          onClick={() => deleteUser(member.id)}
+                     className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-xs"
+                          onClick={() => deleteMember(member?.id)}
                         >
                           Delete
                         </button>
                         <button 
-                          className="text-green-600 hover:text-green-900"
+                        onClick={() => navigate(`/downline/${member?.code}`)}
+                  className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md text-xs"
                         >
                           Profile
                         </button>
-                      </>
+                      </div>
                     )}
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

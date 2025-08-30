@@ -8,7 +8,7 @@ import WithdrawPage from "./pages/Withdraw";
 import DepositPage from "./pages/Deposit";
 import Login from "./pages/Login";
 import Setting from "./pages/Setting";
-import DownlineUser from "../../client/src/components/DownlineUser";
+import DownlineUser from "./pages/DownlineUser";
 
 function App() {
   return (

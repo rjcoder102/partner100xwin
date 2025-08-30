@@ -105,7 +105,7 @@ export const updateWithdrawalStatus = async (req, res) => {
 export const getUserDetailById = async (req, res) => {
     const { id } = req.params;
     try {
-        const [rows] = await pool1.query('SELECT * FROM users WHERE id = ?', [id]);
+        const [rows] = await pool1.query('SELECT * FROM users WHERE code = ?', [id]);
         if (rows.length === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -134,7 +134,7 @@ export const deleteUserById = async (req, res) => {
 export const getDownUsers = async (req, res) => {
     const { id } = req.params;
     try {
-        const [rows] = await pool2.query('SELECT * FROM users WHERE referrer_code = ?', [id]);
+        const [rows] = await pool2.query('SELECT * FROM users WHERE refral_code = ?', [id]);
         res.status(200).json({ message: 'Downline users retrieved successfully', data: rows });
     } catch (error) {
         console.error('Error retrieving downline users:', error);
