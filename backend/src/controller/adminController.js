@@ -65,11 +65,11 @@ export const updateUserStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     try {
-        const [result] = await pool2.query('UPDATE users SET status = ? WHERE id = ?', [status, id]);
+        const [result] = await pool1.query('UPDATE users SET status = ? WHERE id = ?', [status, id]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.status(200).json({ message: 'User status updated successfully' });
+        res.status(200).json({ message: 'User status updated successfully', success: true });
     } catch (error) {
         console.error('Error updating user status:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -78,7 +78,7 @@ export const updateUserStatus = async (req, res) => {
 
 export const getAllWithdrawals = async (req, res) => {
     try {
-        const [rows] = await pool1.query('SELECT * FROM user_withdrowals');
+        const [rows] = await pool1.query('SELECT * FROM user_withdrowal');
         res.status(200).json({ message: 'Withdrawals retrieved successfully', data: rows });
     } catch (error) {
         console.error('Error retrieving withdrawals:', error);
@@ -90,11 +90,11 @@ export const updateWithdrawalStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     try {
-        const [result] = await pool2.query('UPDATE user_withdrowals SET status = ? WHERE id = ?', [status, id]);
+        const [result] = await pool1.query('UPDATE user_withdrowal SET status = ? WHERE id = ?', [status, id]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: 'Withdrawal not found' });
         }
-        res.status(200).json({ message: 'Withdrawal status updated successfully' });
+        res.status(200).json({ message: 'Withdrawal status updated successfully', success: true });
     } catch (error) {
         console.error('Error updating withdrawal status:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -123,7 +123,7 @@ export const deleteUserById = async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.status(200).json({ message: 'User deleted successfully' });
+        res.status(200).json({ message: 'User deleted successfully', success: true });
     }
     catch (error) {
         console.error('Error deleting user:', error);
@@ -134,7 +134,7 @@ export const deleteUserById = async (req, res) => {
 export const getDownUsers = async (req, res) => {
     const { id } = req.params;
     try {
-        const [rows] = await pool1.query('SELECT * FROM users WHERE referrer_id = ?', [id]);
+        const [rows] = await pool2.query('SELECT * FROM users WHERE referrer_code = ?', [id]);
         res.status(200).json({ message: 'Downline users retrieved successfully', data: rows });
     } catch (error) {
         console.error('Error retrieving downline users:', error);

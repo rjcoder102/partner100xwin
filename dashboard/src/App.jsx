@@ -7,6 +7,7 @@ import Member from "./pages/Member";
 import WithdrawPage from "./pages/Withdraw";
 import DepositPage from "./pages/Deposit";
 import Login from "./pages/Login";
+import Setting from "./pages/Setting";
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
         <Route path="/members" element={<Layout><Member /></Layout> } />
         <Route path="/withdraw" element={<Layout><WithdrawPage /></Layout> } />
         <Route path="/deposit" element={<Layout><DepositPage /></Layout> } />
+        <Route path="/deposit" element={<Layout><DepositPage /></Layout> } />
+        <Route path="/settings" element={<Layout><Setting /></Layout> } />
       </Routes>
           <Toaster 
         position="top-right"

@@ -14,12 +14,16 @@ import {
   FiChevronDown,
   FiUser
 } from 'react-icons/fi';
+import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { getUser } from '../Redux/Reducer/adminReducer';
 
 const Layout = ({ children, activePage, setActivePage }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const navigationItems = [
     { id: 'home', label: 'Dashboard', icon: <FiHome size={20} />, link: '/' },
@@ -27,6 +31,10 @@ const Layout = ({ children, activePage, setActivePage }) => {
     { id: 'withdraw', label: 'Withdrawals', icon: <FiDollarSign size={20} />, link: '/withdraw' },
     { id: 'deposit', label: 'Deposits', icon: <FiTrendingUp size={20} />, link: '/deposit' },
   ];
+
+  useEffect(() => {
+    dispatch(getUser());
+  },[dispatch])
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -75,10 +83,10 @@ const Layout = ({ children, activePage, setActivePage }) => {
           </nav>
         </div>
         <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center px-4 py-3 text-gray-300">
+          <Link to={`/settings`} className="flex items-center px-4 py-3 text-gray-300">
             <FiSettings size={18} className="mr-3" />
             <span className="font-medium">Settings</span>
-          </div>
+          </Link>
         </div>
       </div>
 

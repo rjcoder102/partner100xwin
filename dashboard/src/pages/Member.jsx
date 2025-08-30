@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { AllUsers } from '../Redux/Reducer/adminReducer';
+import { AllUsers, deleteUser, updateUserStatus } from '../Redux/Reducer/adminReducer';
 import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 // Members Page Component
 const Member = () => {
@@ -22,18 +23,15 @@ const Member = () => {
     dispatch(AllUsers());
   }, [dispatch])
 
-  console.log( users )
-
-  const toggleBlockUser = (id) => {
-    setMembers(members.map(member => 
-      member.id === id 
-        ? { ...member, status: member.status === 'Active' ? 'Blocked' : 'Active' } 
-        : member
-    ));
-  };
-
-  const deleteUser = (id) => {
-    setMembers(members.filter(member => member.id !== id));
+  const deleteMember = (id) => {
+    dispatch(deleteUser(id)).then((res) => {
+      if (res.payload.success) {
+        dispatch(AllUsers());
+        toast.success(res.payload.message);
+      } else {
+        toast.error(res.payload.message || "Failed to delete user");
+      }
+    })
   };
 
   const updateStatus = (id, currentStatus) => {
@@ -47,13 +45,16 @@ const Member = () => {
   };
 
   const saveStatus = (id) => {
-    setMembers(members.map(member => 
-      member.id === id 
-        ? { ...member, status: tempStatus } 
-        : member
-    ));
-    setEditingId(null);
-    setTempStatus('');
+
+    dispatch(updateUserStatus({ id: id, status: tempStatus })).then((res) => {
+      if (res.payload.success) {
+        dispatch(AllUsers());
+        toast.success(res.payload.message);
+      } else {
+        toast.error(res.payload.message || "Failed to update status");
+      }
+    })
+        setEditingId(null);
   };
 
   const viewProfile = (id) => {
@@ -119,20 +120,20 @@ const Member = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     {editingId === member.id ? (
-                      <>
+                      <div className='space-x-2'>
                         <button 
-                          className="text-green-600 hover:text-green-900 mr-3"
+                          className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md text-xs"
                           onClick={() => saveStatus(member.id)}
                         >
                           Update
                         </button>
                         <button 
-                          className="text-gray-600 hover:text-gray-900"
+                         className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-xs"
                           onClick={cancelEditing}
                         >
                           Cancel
                         </button>
-                      </>
+                      </div>
                     ) : (
                       <div className='space-x-2'>
                         <button 
@@ -143,7 +144,7 @@ const Member = () => {
                         </button>
                         <button 
                      className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-xs"
-                          onClick={() => deleteUser(member.id)}
+                          onClick={() => deleteMember(member?.id)}
                         >
                           Delete
                         </button>
