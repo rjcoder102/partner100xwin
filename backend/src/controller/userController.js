@@ -624,6 +624,32 @@ export const updateDealyShare = async (req, res) => {
             withdrawalValues
         );
 
+        let bonusQuery = `
+            FROM bonus_ledger 
+            WHERE refral_code = ? 
+            AND DATE(created_at) BETWEEN ? AND CURDATE()
+        `;
+        let bomusValues = [userInfo.code, startDate];
+
+        const [bonusRows] = await pool2.query(
+            `SELECT * ${bonusQuery} ORDER BY updated_at DESC`,
+            withdrawalValues
+        );
+
+        console.log("bonusRows", bonusRows);
+
+
+
+        const [totalBonus] = await pool2.query(
+            `SELECT SUM(amount) AS totalAmount ${bonusQuery}`,
+            bomusValues
+        );
+
+        console.log("totalBonus", totalBonus);
+
+
+
+
         // ✅ Get total balance of all users with same refral_code
         const [currentBalanceRows] = await pool2.query(
             `SELECT SUM(balance) AS totalBalance FROM users WHERE refral_code = ?`,
@@ -633,6 +659,7 @@ export const updateDealyShare = async (req, res) => {
 
         let totalDepositeAmount = totalDeposite[0]?.totalAmount || 0;
         let totalWithdrowalAmount = totalwithdrawal[0]?.totalAmount || 0;
+        let totalBonusAmount = totalBonus[0]?.totalAmount || 0;
         let totalBalance = Number(currentBalanceRows[0]?.totalBalance) || 0;
 
 
@@ -649,6 +676,8 @@ export const updateDealyShare = async (req, res) => {
             percentage = 60;
         }
 
+
+
         profitShare = (profit * percentage) / 100;
 
         await pool1.query("UPDATE users SET shere_wallet = ? WHERE id = ?", [
@@ -660,6 +689,7 @@ export const updateDealyShare = async (req, res) => {
             userInfo,
             totalDepositeAmount,
             totalWithdrowalAmount,
+            totalBonusAmount,
             totalBalance,
             profit,
             profitShare,
