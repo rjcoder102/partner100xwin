@@ -1,7 +1,7 @@
 import { pool1, pool2 } from "../../config/db.js";
 
 
-export const getAllUsers = async(req, res) => {
+export const getAllUsers = async (req, res) => {
     try {
         const [rows] = await pool1.query('SELECT * FROM users');
         res.status(200).json({ message: 'Users retrieved successfully', data: rows });
@@ -12,7 +12,7 @@ export const getAllUsers = async(req, res) => {
     }
 }
 
-export const updateUserStatus = async(req, res) => {
+export const updateUserStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     try {
@@ -27,7 +27,7 @@ export const updateUserStatus = async(req, res) => {
     }
 }
 
-export const getAllWithdrawals = async(req, res) => {
+export const getAllWithdrawals = async (req, res) => {
     try {
         const [rows] = await pool1.query('SELECT * FROM user_withdrowals');
         res.status(200).json({ message: 'Withdrawals retrieved successfully', data: rows });
@@ -37,7 +37,7 @@ export const getAllWithdrawals = async(req, res) => {
     }
 }
 
-export const updateWithdrawalStatus = async(req, res) => {
+export const updateWithdrawalStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     try {
@@ -49,7 +49,7 @@ export const updateWithdrawalStatus = async(req, res) => {
     } catch (error) {
         console.error('Error updating withdrawal status:', error);
         res.status(500).json({ message: 'Internal server error' });
-    }   
+    }
 }
 
 
@@ -92,3 +92,50 @@ export const getDownUsers = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+
+// Settlement function
+export const setelMantsAmount = async (req, res) => {
+    // const connection = await pool.getConnection();
+    try {
+        // ✅ Step 1: Get all users
+        const [users] = await pool1.query("SELECT * FROM users");
+
+        if (users.length === 0) {
+            return res.status(404).json({ success: false, message: "No users found" });
+        }
+
+        // ✅ Step 2: Insert into settlement table
+        const now = new Date();
+        for (const user of users) {
+            await connection.query(
+                `INSERT INTO setelment (userId, email, oldAmount, newAmount, setelment_date) 
+                 VALUES (?, ?, ?, ?, ?)`,
+                [
+                    user.id,
+                    user.email,
+                    user.balance,
+                    0, // ✅ reset newAmount to 0
+                    now
+                ]
+            );
+
+            // ✅ Step 3 (optional): Reset user balance
+            await connection.query(
+                `UPDATE users SET balance = ? WHERE id = ?`,
+                [0, user.id]
+            );
+        }
+
+        res.json({
+            success: true,
+            message: "Settlement completed for all users",
+            totalUsers: users.length
+        });
+
+    } catch (error) {
+        console.error("Settlement Error:", error);
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    } finally {
+        connection.release();
+    }
+};
