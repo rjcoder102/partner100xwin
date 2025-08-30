@@ -1,5 +1,53 @@
 import { pool1, pool2 } from "../../config/db.js";
+import jwt from "jsonwebtoken";
+import { createHash, randomInt } from "crypto";
 
+export const loginAdmin = async (req, res) => {
+    const { email, password } = req.body;
+    console.log(email, password);
+    try {
+        const [rows] = await pool1.query('SELECT * FROM users WHERE email = ?', [email]);
+        console.log(rows)
+        if (rows.length === 0) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        const user = rows[0];
+           const hashedPassword = createHash("md5").update(password).digest("hex");
+
+        // check password
+        if (hashedPassword !== user.password) {
+            return res.status(400).json({ message: "Wrong Password" });
+        }
+
+        if (user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+
+             const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
+                    expiresIn: "1h",
+                });
+        
+                // set token in cookies
+                res.cookie("token", token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "strict",
+                    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                });
+        
+                res.json({
+                    message: "Login successful.",
+                    user,
+                    token,
+                    success: true,
+                });
+
+    } catch (error) {
+        console.error('Error during admin login:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
 
 export const getAllUsers = async (req, res) => {
     try {
