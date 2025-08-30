@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUser, logoutUser } from "../Redux/reducer/authSlice";
 // import { getUserProfile, logoutUser } from "../Redux/reducer/authSlice";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 
 const languages = [
@@ -70,7 +71,7 @@ const DashboardHeader = () => {
             if(res.payload.success){
         navigate("/signin"); 
             } else {
-                alert(res.payload.message || "Logout failed!");
+                toast.success(res.payload.message || "Logout failed!");
             }
         })
     };

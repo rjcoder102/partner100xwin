@@ -1,0 +1,33 @@
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from 'sonner';
+import Home from "./pages/Home";
+import Layout from "./component/DashboardLayout";
+import Member from "./pages/Member";
+import WithdrawPage from "./pages/Withdraw";
+import DepositPage from "./pages/Deposit";
+import Login from "./pages/Login";
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<Layout><Home /></Layout> } />
+        <Route path="/login" element={<Login /> } />
+        <Route path="/members" element={<Layout><Member /></Layout> } />
+        <Route path="/withdraw" element={<Layout><WithdrawPage /></Layout> } />
+        <Route path="/deposit" element={<Layout><DepositPage /></Layout> } />
+      </Routes>
+          <Toaster 
+        position="top-right"
+        expand={false}
+        richColors
+        closeButton
+        theme="light"
+      />
+    </Router>
+  );
+}
+
+export default App;

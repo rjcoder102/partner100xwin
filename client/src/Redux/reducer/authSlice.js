@@ -135,6 +135,24 @@ export const profileUpdate = createAsyncThunk(
   }
 );
 
+export const staticalDataCode = createAsyncThunk(
+  "auth/staticalData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await api.get("/auth/statical", {
+        withCredentials: true,
+      });
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Something went wrong" }
+      );
+    }
+  }
+);
+
+
+
 // Utility to decode JWT token
 
 
@@ -156,6 +174,7 @@ const authSlice = createSlice({
     loading: false,
     error: null,
     success: null,
+    staticdata: null,
   },
   reducers: {
     messageClear: (state, _) => {
@@ -255,7 +274,21 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.error = action.payload;
-      });
+      })
+
+      // static
+      // .addCase(staticalDataCode.pending, (state) => {
+      //              state.loading = true;
+      //          })
+               .addCase(staticalDataCode.fulfilled, (state, action) => {
+                   state.loading = false;
+                   state.staticdata = action.payload || null;
+               })
+              //  .addCase(staticalDataCode.rejected, (state, action) => {
+              //      state.loading = false;
+              //      state.error = action.payload?.message || "Failed to fetch game history";
+              //  });
+      
   },
 });
 

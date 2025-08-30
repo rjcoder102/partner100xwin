@@ -15,7 +15,7 @@ const Withdrawl = () => {
     const error = downlineWithdrawals?.error || null;
 
     // Local UI states
-    const [filter, setFilter] = useState("month"); // day | week | month
+    const [filter, setFilter] = useState("all"); // day | week | month
     const [dateFilter, setDateFilter] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
@@ -139,7 +139,7 @@ const Withdrawl = () => {
                 <div className="bg-white shadow-md rounded-lg p-4 mb-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div className="flex flex-wrap gap-2">
-                            {["day", "week", "month"].map((type) => (
+                            {["all", "day", "week", "month"].map((type) => (
                                 <button
                                     key={type}
                                     onClick={() => {
@@ -205,7 +205,7 @@ const Withdrawl = () => {
                                             <td className="p-4">
                                                 <span
                                                     className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                                        w.status === "Success"
+                                                        w.status === 1
                                                             ? "bg-green-100 text-green-800"
                                                             : w.status === "Pending"
                                                                 ? "bg-yellow-100 text-yellow-800"
@@ -297,62 +297,3 @@ const Withdrawl = () => {
 
 export default Withdrawl;
 
-
-
-// {
-//     "loading": false,
-//     "success": false,
-//     "error": null,
-//     "withdrawal": null,
-//     "downlineDeposits": {
-//         "data": [],
-//         "loading": false,
-//         "error": null
-//     },
-//     "downlineWithdrawals": {
-//         "data": {
-//             "userInfo": {
-//                 "id": 24,
-//                 "email": "surajbhai@gmail.com",
-//                 "code": "1678302408"
-//             },
-//             "downlineWithdrowal": [
-//                 {
-//                     "id": 49,
-//                     "user_id": 1984,
-//                     "admin_id": 1,
-//                     "amount": 1000,
-//                     "txn_type": "bank",
-//                     "upi": null,
-//                     "account_id": "1234567890",
-//                     "ifsc_code": "rjiuthiu",
-//                     "bank_name": "gjh8urhu",
-//                     "branch": "rhjiuhui",
-//                     "username": "bhai3",
-//                     "refral_code": "1678302408",
-//                     "status": 1,
-//                     "updated_at": "2025-08-19T08:16:13.000Z"
-//                 },
-//                 {
-//                     "id": 50,
-//                     "user_id": 1984,
-//                     "admin_id": 1,
-//                     "amount": 1000,
-//                     "txn_type": "bank",
-//                     "upi": null,
-//                     "account_id": "1234567890",
-//                     "ifsc_code": "rjiuthiu",
-//                     "bank_name": "gjh8urhu",
-//                     "branch": "rhjiuhui",
-//                     "username": "bhai3",
-//                     "refral_code": "1678302408",
-//                     "status": 1,
-//                     "updated_at": "2025-08-19T08:16:32.000Z"
-//                 }
-//             ],
-//             "totalAmount": 2000
-//         },
-//         "loading": false,
-//         "error": null
-//     }
-// }

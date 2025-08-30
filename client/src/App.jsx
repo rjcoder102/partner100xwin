@@ -16,6 +16,7 @@ import Withdrawl from "./pages/Withdrawl";
 import DownlineUser from "./components/DownlineUser";
 import Layout from "./layout/Layout";
 import LinksPage from "./pages/LinksPage";
+import { Toaster } from 'sonner';
 
 function App() {
   return (
@@ -42,6 +43,13 @@ function App() {
           </Route>
         </Route>
       </Routes>
+          <Toaster 
+        position="top-right"
+        expand={false}
+        richColors
+        closeButton
+        theme="light"
+      />
     </Router>
   );
 }
