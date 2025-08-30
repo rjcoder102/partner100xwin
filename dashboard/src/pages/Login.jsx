@@ -1,14 +1,29 @@
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaGoogle, FaFacebook, FaTwitter } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
+import { AdminLogin } from '../Redux/Reducer/adminReducer';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    dispatch(AdminLogin({ email, password })).then((res) => {
+      if (res.payload.success) {
+        alert(res.payload.message);
+      navigate('/');
+      } else {
+        alert(res.payload.message || 'Login failed');
+      }
+    })
     console.log('Logging in with:', { email, password, rememberMe });
   };
 

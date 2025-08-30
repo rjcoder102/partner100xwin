@@ -1,12 +1,14 @@
 import express from 'express';
-import { deleteUserById, getAllUsers, getAllWithdrawals, getUserDetailById, updateWithdrawalStatus } from '../controller/adminController.js';
+import { deleteUserById, getAllUsers, getAllWithdrawals, getUserDetailById, loginAdmin, updateWithdrawalStatus } from '../controller/adminController.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/get-all-users', getAllUsers)
-router.get('/get-user-by-id/:id', getUserDetailById)
-router.delete('/delete-user-by-id/:id', deleteUserById)
-router.get('/get-all-withdrawals', getAllWithdrawals)
-router.put('/update-withdrawal-status/:id', updateWithdrawalStatus)
+router.post('/admin-login', loginAdmin);
+router.get('/get-all-users',authMiddleware, getAllUsers)
+router.get('/get-user-by-id/:id',authMiddleware, getUserDetailById)
+router.delete('/delete-user-by-id/:id',authMiddleware, deleteUserById)
+router.get('/get-all-withdrawals',authMiddleware, getAllWithdrawals)
+router.put('/update-withdrawal-status/:id',authMiddleware, updateWithdrawalStatus)
 
 export default router;
