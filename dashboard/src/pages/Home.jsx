@@ -1,15 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AllUsers, getLengthofData } from '../Redux/Reducer/adminReducer';
 
 // Dashboard Layout Component
 
 
 // Home Page Component
 const Home = () => {
+  const dispatch = useDispatch();
+  const { staticData, users } = useSelector((state) => state.admin);
+
+  useEffect(() => {
+    dispatch(getLengthofData());
+        dispatch(AllUsers());
+  },[dispatch])
+
   const stats = [
-    { title: 'Total Members', value: '1,254', change: '+12%', icon: '👥' },
-    { title: 'Total Withdrawals', value: '$42,845', change: '+8%', icon: '💸' },
-    { title: 'Total Deposits', value: '$87,639', change: '+15%', icon: '💰' },
-    { title: 'Blocked Users', value: '23', change: '-2%', icon: '🚫' },
+    { title: 'Total Members', value: staticData?.userCount,  icon: '👥' },
+    { title: 'Total Withdrawals', value: staticData?.withdrawalCount, icon: '💸' },
+    { title: 'Total Balance', value: staticData?.totalBalance,  icon: '💰' },
+    { title: 'Total Share Wallet', value: staticData?.totalShereWallet, icon: '🚫' },
   ];
 
   return (
@@ -24,11 +34,8 @@ const Home = () => {
               <div>
                 <p className="text-sm font-medium text-gray-500">{stat.title}</p>
                 <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-                <p className={`text-sm ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-                  {stat.change} from last week
-                </p>
               </div>
-              <div className="p-3 bg-blue-100 rounded-full">
+              <div className="p-3 bg-[#cffff1] rounded-full">
                 <span className="text-2xl">{stat.icon}</span>
               </div>
             </div>
@@ -37,55 +44,43 @@ const Home = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h2>
+    <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead>
+            <thead className="bg-[#08c18a]">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Member</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Share wallet</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Balance</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Joined</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              <tr>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      <img className="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=John+Doe&background=0D8ABC&color=fff" alt=""/>
+              {users?.slice(0, 6).map((member, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-2 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{member?.fname}</div>
+                        <div className="text-sm text-gray-500">{member.email}</div>
+                      </div>
                     </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">John Doe</div>
-                      <div className="text-sm text-gray-500">john@example.com</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">Withdrawal</td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">Jan 12, 2023</td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      <img className="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=Jane+Smith&background=0D8ABC&color=fff" alt=""/>
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">Jane Smith</div>
-                      <div className="text-sm text-gray-500">jane@example.com</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">Deposit</td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">Jan 11, 2023</td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                </td>
-              </tr>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member?.role}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member?.shere_wallet}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member?.balance}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {member?.created_at ? new Date(member.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : ''}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${member.status === '0' ? 'bg-green-100 text-green-800' : member.status === '1' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                        {member.status === '0' ? 'Active' : member.status === '1' ? 'Blocked' : 'Pending'}
+                      </span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

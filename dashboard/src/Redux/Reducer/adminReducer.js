@@ -213,6 +213,7 @@ export const MountSingle = createAsyncThunk(
     }
 );
 
+
 export const MountAll = createAsyncThunk(
   "user/MountAll",
   async (_, { rejectWithValue }) => {
@@ -232,12 +233,32 @@ export const MountAll = createAsyncThunk(
     }
 );
 
+
+export const getLengthofData = createAsyncThunk(
+  "user/getLengthofData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/get-data`, {
+        withCredentials: true,
+        credentials: true,
+      });
+      return response.data;
+    }
+    catch (error) {
+        return rejectWithValue(
+        error.response?.data || { message: "Something went wrong" }
+      );
+    }
+    }
+);
+
 const adminSlice = createSlice({
   name: "admin",
   name: "adminslice",
   initialState: {
     users: [],
     withdraws: [],
+    staticData: null,
     downlinedata: [],
     singleuser: null,
     userInfo: null,
@@ -326,6 +347,18 @@ const adminSlice = createSlice({
         state.singleuser = action.payload.data;
       })
       .addCase(getSingleUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getLengthofData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getLengthofData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.staticData = action.payload.data;
+      })
+      .addCase(getLengthofData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

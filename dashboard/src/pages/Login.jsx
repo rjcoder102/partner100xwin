@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaGoogle, FaFacebook, FaTwitter 
 import { useDispatch } from 'react-redux';
 import { AdminLogin } from '../Redux/Reducer/adminReducer';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -18,10 +19,10 @@ const Login = () => {
     e.preventDefault();
     dispatch(AdminLogin({ email, password })).then((res) => {
       if (res.payload.success) {
-        alert(res.payload.message);
+        toast.success(res.payload.message);
       navigate('/');
       } else {
-        alert(res.payload.message || 'Login failed');
+        toast.error(res.payload.message || 'Login failed');
       }
     })
     console.log('Logging in with:', { email, password, rememberMe });

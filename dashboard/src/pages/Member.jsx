@@ -111,9 +111,6 @@ const Member = () => {
                 <tr key={index}>
                   <td className="px-6 py-2 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-8 w-8">
-                        <img className="h-8 w-8 rounded-full" src={`https://ui-avatars.com/api/?name=${member?.fname}&background=0D8ABC&color=fff`} alt=""/>
-                      </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">{member?.fname}</div>
                         <div className="text-sm text-gray-500">{member.email}</div>

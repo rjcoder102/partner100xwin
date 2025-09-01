@@ -58,9 +58,7 @@ const WithdrawPage = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Withdrawal Requests</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">
-          Export Data
-        </button>
+ 
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -131,7 +129,7 @@ const WithdrawPage = () => {
                     ) : (
                       <div className="flex space-x-2">
                         <button 
-                          className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-xs"
+                          className="bg-[#08c18a] text-white py-1 px-3 rounded-md text-xs"
                           onClick={() => startEditing(withdrawal.id, withdrawal.status)}
                         >
                           Update

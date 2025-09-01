@@ -52,7 +52,7 @@ export const loginAdmin = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
     try {
-        const [rows] = await pool1.query('SELECT * FROM users');
+        const [rows] = await pool1.query('SELECT * FROM users AS u ORDER BY u.id DESC');
         res.status(200).json({ message: 'Users retrieved successfully', data: rows });
     }
     catch (error) {
@@ -255,5 +255,26 @@ export const setelMantsAmountSingleUser = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
 };
+
+export const getLengthofData = async (req, res) => {
+    try {
+        const [[userCount]] = await pool1.query('SELECT COUNT(*) AS count FROM users');
+        const [[withdrawalCount]] = await pool1.query('SELECT COUNT(*) AS count FROM user_withdrowal');
+        const [[totalBalance]] = await pool1.query('SELECT SUM(balance) AS total FROM users');
+        const [[totalShereWallet]] = await pool1.query('SELECT SUM(shere_wallet) AS total FROM users');
+        res.status(200).json({ 
+            message: 'Data retrieved successfully', 
+            data: {
+                userCount: userCount.count, 
+                withdrawalCount: withdrawalCount.count, 
+                totalBalance: totalBalance.total || 0, 
+                totalShereWallet: totalShereWallet.total || 0 
+            } 
+        });
+    } catch (error) {
+        console.error('Error retrieving data lengths:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
 
 

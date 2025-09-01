@@ -9,20 +9,23 @@ import DepositPage from "./pages/Deposit";
 import Login from "./pages/Login";
 import Setting from "./pages/Setting";
 import DownlineUser from "./pages/DownlineUser";
+import PrivateRoute from "./Redux/PrivateRoute";
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<Layout><Home /></Layout> } />
         <Route path="/login" element={<Login /> } />
+             <Route element={<PrivateRoute />}>
+        <Route path="/" element={<Layout><Home /></Layout> } />
         <Route path="/members" element={<Layout><Member /></Layout> } />
         <Route path="/downline/:id" element={<Layout><DownlineUser /></Layout> } />
         <Route path="/withdraw" element={<Layout><WithdrawPage /></Layout> } />
         <Route path="/deposit" element={<Layout><DepositPage /></Layout> } />
         <Route path="/deposit" element={<Layout><DepositPage /></Layout> } />
         <Route path="/settings" element={<Layout><Setting /></Layout> } />
+        </Route>
       </Routes>
           <Toaster 
         position="top-right"
