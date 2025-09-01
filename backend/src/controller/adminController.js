@@ -277,4 +277,35 @@ export const getLengthofData = async (req, res) => {
     }
 }
 
+export const getDownlineRecharge = async (req, res) => {
+    const { code } = req.params;
+
+    try {
+        let baseQuery = "FROM depositrequests WHERE refral_code = ? AND status = 1";
+        let withQuery = "FROM withdrawrequests WHERE refral_code = ? AND status = 1";
+        let values = [code];
+
+        const [depositRows] = await pool2.query(`SELECT * ${baseQuery}`, values);
+        const [withRows] = await pool2.query(`SELECT * ${withQuery}`, values);
+        const [totalRows] = await pool2.query(`SELECT SUM(amount) as totalAmount ${baseQuery}`, values);
+        const [totalwithRows] = await pool2.query(`SELECT SUM(amount) as totalAmount ${withQuery}`, values);
+
+        const totalAmount = totalRows[0]?.totalAmount || 0
+        const totalwithAmount = totalwithRows[0]?.totalwithAmount || 0
+
+        res.json({
+            success: true,
+            data: {
+
+            depositRows,
+            totalAmount,
+            withRows,
+            totalwithAmount
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching downline deposits:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 

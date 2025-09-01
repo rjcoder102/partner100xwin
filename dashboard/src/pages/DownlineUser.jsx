@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AllUsers, getDownline, getSingleUser, updateUserStatus } from '../Redux/Reducer/adminReducer';
+import { AllUsers, getDownline, getdownrecharge, getSingleUser, updateUserStatus } from '../Redux/Reducer/adminReducer';
 import { useParams, useNavigate } from 'react-router-dom';
 
 // DownlineUsers Page Component
 const DownlineUser = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const {downlinedata, singleuser} = useSelector((state) => state.admin);
+  const {downlinedata, singleuser, downrechage} = useSelector((state) => state.admin);
   const dispatch = useDispatch();
   
   const [editingId, setEditingId] = useState(null);
@@ -17,7 +17,10 @@ const DownlineUser = () => {
   useEffect(() => {
     dispatch(getDownline(id));
     dispatch(getSingleUser(id));
+    dispatch(getdownrecharge(id))
   }, [dispatch, id]);
+
+  console.log(downrechage)
 
   // Calculate total downline balance and count
   const totalDownlineBalance = downlinedata?.reduce((total, user) => total + (parseFloat(user.balance) || 0), 0) || 0;
@@ -103,13 +106,21 @@ const DownlineUser = () => {
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Downline Summary</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <p className="text-sm text-blue-600">Total Downline Users</p>
-            <p className="text-2xl font-bold text-blue-800">{downlineCount}</p>
+          <div className="bg-green-50 p-4 rounded-lg border-1 border-[#08c18a]">
+            <p className="text-sm ">Total Downline Users</p>
+            <p className="text-2xl font-bold ">{downlineCount}</p>
           </div>
-          <div className="bg-green-50 p-4 rounded-lg">
+          <div className="bg-green-50 p-4 rounded-lg border-1 border-[#08c18a]">
             <p className="text-sm text-green-600">Total Downline Balance</p>
             <p className="text-2xl font-bold text-green-800">${totalDownlineBalance.toFixed(2)}</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg border-1 border-[#08c18a]">
+            <p className="text-sm text-green-600">Total Downline Recharge</p>
+            <p className="text-2xl font-bold text-green-800">${downrechage?.totalAmount}</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg border-1 border-[#08c18a]">
+            <p className="text-sm text-green-600">Total Downline Withdraw</p>
+            <p className="text-2xl font-bold text-green-800">${downrechage?.totalwithAmount}</p>
           </div>
         </div>
       </div>
@@ -118,14 +129,14 @@ const DownlineUser = () => {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-[#08c18a]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Password</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Member</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Balance</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Password</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Joined</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
                 {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th> */}
               </tr>
             </thead>

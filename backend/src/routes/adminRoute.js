@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteUserById, getAllUsers, getAllWithdrawals, getDownUsers, getLengthofData, getUserDetailById, loginAdmin, setelMantsAmount, setelMantsAmountSingleUser, updateUserStatus, updateWithdrawalStatus } from '../controller/adminController.js';
+import { deleteUserById, getAllUsers, getAllWithdrawals, getDownlineRecharge, getDownUsers, getLengthofData, getUserDetailById, loginAdmin, setelMantsAmount, setelMantsAmountSingleUser, updateUserStatus, updateWithdrawalStatus } from '../controller/adminController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -15,5 +15,6 @@ router.post('/user-setelments', setelMantsAmount)
 router.post('/sigle-user-setelments/:userId', setelMantsAmountSingleUser)
 router.get('/get-downline-user/:id', authMiddleware, getDownUsers)
 router.get('/get-data', authMiddleware, getLengthofData)
+router.get('/get-downline-recharge/:code', authMiddleware, getDownlineRecharge);
 
 export default router;
