@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { AllUsers, deleteUser, updateUserStatus } from '../Redux/Reducer/adminReducer';
+import { AllUsers, deleteUser, MountAll, MountSingle, updateUserStatus } from '../Redux/Reducer/adminReducer';
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 // Members Page Component
 const Member = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { users } = useSelector((state) => state.admin);
   const [members, setMembers] = useState([
     { id: 1, name: 'John Doe', email: 'john@example.com', status: 'Active', balance: '$1,250', joined: 'Jan 12, 2023' },
@@ -57,15 +59,37 @@ const Member = () => {
         setEditingId(null);
   };
 
-  const viewProfile = (id) => {
-    // In a real app, this would navigate to the user's profile page
-    alert(`Viewing profile of user with ID: ${id}`);
-  };
+  const handlemount = (userId) => {
+    console.log(userId)
+    dispatch(MountSingle(userId)).then((res) => {
+      if (res.payload.success) {
+        toast.success(res.payload.message);
+      } else {
+        toast.error(res.payload.message || "Failed to settle amount");
+      }
+    })
+  }
+
+  const handleAllMount = () => {
+    dispatch(MountAll()).then((res) => {
+      if (res.payload.success) {
+        toast.success(res.payload.message);
+      } else {
+        toast.error(res.payload.message || "Failed to settle amount");
+      }
+    })
+  }
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Members Management</h1>
+                 <button 
+                        onClick={handleAllMount}
+                  className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-3 rounded-md text-base"
+                        >
+                          Mount All
+                        </button>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -97,8 +121,8 @@ const Member = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member?.role}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member?.balance}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member?.shere_wallet}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{member?.balance}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {member?.created_at ? new Date(member.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : ''}
                   </td>
@@ -149,9 +173,16 @@ const Member = () => {
                           Delete
                         </button>
                         <button 
+                        onClick={() => navigate(`/downline/${member?.code}`)}
                   className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md text-xs"
                         >
                           Profile
+                        </button>
+                        <button 
+                        onClick={() => handlemount(member?.id)}
+                  className="bg-purple-500 hover:bg-purple-600 text-white py-1 px-3 rounded-md text-xs"
+                        >
+                          Mount
                         </button>
                       </div>
                     )}
