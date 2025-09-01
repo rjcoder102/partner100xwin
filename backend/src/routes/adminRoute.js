@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteUserById, getAllUsers, getAllWithdrawals, getUserDetailById, loginAdmin, setelMantsAmount, setelMantsAmountSingleUser, updateWithdrawalStatus } from '../controller/adminController.js';
+import { deleteUserById, getAllUsers, getAllWithdrawals, getUserDetailById, loginAdmin, setelMantsAmount, setelMantsAmountSingleUser, updateUserStatus, updateWithdrawalStatus } from '../controller/adminController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
