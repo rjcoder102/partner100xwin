@@ -3,6 +3,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock, FaGoogle, FaFacebook, FaTwitter 
 import { useDispatch } from 'react-redux';
 import { AdminLogin } from '../Redux/Reducer/adminReducer';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -18,10 +19,10 @@ const Login = () => {
     e.preventDefault();
     dispatch(AdminLogin({ email, password })).then((res) => {
       if (res.payload.success) {
-        alert(res.payload.message);
+        toast.success(res.payload.message);
       navigate('/');
       } else {
-        alert(res.payload.message || 'Login failed');
+        toast.error(res.payload.message || 'Login failed');
       }
     })
     console.log('Logging in with:', { email, password, rememberMe });
@@ -53,7 +54,7 @@ const Login = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#08c18a] focus:border-[#08c18a]"
                   placeholder="Enter your email"
                 />
               </div>
@@ -75,7 +76,7 @@ const Login = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#08c18a] focus:border-[#08c18a]"
                   placeholder="Enter your password"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -102,24 +103,18 @@ const Login = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={() => setRememberMe(!rememberMe)}
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-[#08c18a] focus:ring-[#08c18a] border-gray-300 rounded"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   Remember me
                 </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                  Forgot your password?
-                </a>
               </div>
             </div>
 
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#08c18a]  focus:outline-none focus:ring-2 focus:ring-offset-2  transition duration-200"
               >
                 Sign in
               </button>

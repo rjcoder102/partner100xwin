@@ -52,7 +52,7 @@ export const loginAdmin = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
     try {
-        const [rows] = await pool1.query('SELECT * FROM users');
+        const [rows] = await pool1.query('SELECT * FROM users AS u ORDER BY u.id DESC');
         res.status(200).json({ message: 'Users retrieved successfully', data: rows });
     }
     catch (error) {
@@ -256,4 +256,56 @@ export const setelMantsAmountSingleUser = async (req, res) => {
     }
 };
 
+export const getLengthofData = async (req, res) => {
+    try {
+        const [[userCount]] = await pool1.query('SELECT COUNT(*) AS count FROM users');
+        const [[withdrawalCount]] = await pool1.query('SELECT COUNT(*) AS count FROM user_withdrowal');
+        const [[totalBalance]] = await pool1.query('SELECT SUM(balance) AS total FROM users');
+        const [[totalShereWallet]] = await pool1.query('SELECT SUM(shere_wallet) AS total FROM users');
+        res.status(200).json({ 
+            message: 'Data retrieved successfully', 
+            data: {
+                userCount: userCount.count, 
+                withdrawalCount: withdrawalCount.count, 
+                totalBalance: totalBalance.total || 0, 
+                totalShereWallet: totalShereWallet.total || 0 
+            } 
+        });
+    } catch (error) {
+        console.error('Error retrieving data lengths:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export const getDownlineRecharge = async (req, res) => {
+    const { code } = req.params;
+
+    try {
+        let baseQuery = "FROM depositrequests WHERE refral_code = ? AND status = 1";
+        let withQuery = "FROM withdrawrequests WHERE refral_code = ? AND status = 1";
+        let values = [code];
+
+        const [depositRows] = await pool2.query(`SELECT * ${baseQuery}`, values);
+        const [withRows] = await pool2.query(`SELECT * ${withQuery}`, values);
+        const [totalRows] = await pool2.query(`SELECT SUM(amount) as totalAmount ${baseQuery}`, values);
+        const [totalwithRows] = await pool2.query(`SELECT SUM(amount) as totalAmount ${withQuery}`, values);
+
+        const totalAmount = totalRows[0]?.totalAmount || 0
+        const totalwithAmount = totalwithRows[0]?.totalwithAmount || 0
+
+        res.json({
+            success: true,
+            data: {
+
+            depositRows,
+            totalAmount,
+            withRows,
+            totalwithAmount
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching downline deposits:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 

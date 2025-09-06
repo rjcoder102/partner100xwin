@@ -174,7 +174,7 @@ const Setting = () => {
                         <button className="text-red-500 text-sm hover:underline">✖ Delete account</button>
                         <button
                             onClick={handleProfileSave}
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition"
+                            className="bg-[#08c18a]  text-white px-6 py-2 rounded-lg transition"
                             disabled={loading}
                         >
                             {loading ? "Saving..." : "Save"}
@@ -224,7 +224,7 @@ const Setting = () => {
 
                     <button
                         onClick={handleChangePassword}
-                        className="bg-blue-500 hover:bg-blue-600 text-white w-full mt-4 py-2 rounded-lg transition"
+                        className="bg-[#08c18a]  text-white w-full mt-4 py-2 rounded-lg transition"
                         disabled={loading}
                     >
                         {loading ? "Changing..." : "Change Password"}
