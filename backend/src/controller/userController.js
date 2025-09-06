@@ -661,8 +661,6 @@ export const updateDealyShare = async (req, res) => {
         let totalWithdrowalAmount = totalwithdrawal[0]?.totalAmount || 0;
         let totalBonusAmount = totalBonus[0]?.totalAmount || 0;
         let totalBalance = Number(currentBalanceRows[0]?.totalBalance) || 0;
-
-
         const profit = totalDepositeAmount - totalWithdrowalAmount - totalBalance;
 
         let profitShare = 0;
